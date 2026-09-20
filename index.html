@@ -2,288 +2,550 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Weed Clicker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Weed Clicker Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* Variables natives Telegram et Thème */
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #121614);
+            --bg-sec-color: var(--tg-theme-secondary-bg-color, #1e2621);
+            --text-color: var(--tg-theme-text-color, #ffffff);
+            --hint-color: var(--tg-theme-hint-color, #888888);
+            --btn-color: var(--tg-theme-button-color, #2ecc71);
+            --btn-text-color: var(--tg-theme-button-text-color, #000000);
+            --accent: #2ecc71;
+            --accent-dark: #27ae60;
+        }
+
         * {
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            touch-action: manipulation;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--tg-theme-bg-color, #121614);
-            color: var(--tg-theme-text-color, #ffffff);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
-            padding: 16px;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
+
+        /* Header & Admin */
         .header {
-            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            padding: 15px 20px;
+            background-color: var(--bg-sec-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            z-index: 5;
         }
+        .header h1 { margin: 0; font-size: 18px; color: var(--accent); }
         .admin-btn {
-            background-color: #27ae60;
-            border: none;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 13px;
+            background-color: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
         }
-        .counter-box {
-            text-align: center;
-            margin-bottom: 20px;
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            background-color: var(--bg-sec-color);
+            border-bottom: 1px solid #333;
         }
-        .counter {
-            font-size: 32px;
-            font-weight: 800;
-            color: #2ecc71;
-            margin: 0;
-        }
-        .sub-counter {
+        .tab-btn {
+            flex: 1;
+            padding: 12px 0;
+            background: none;
+            border: none;
+            color: var(--hint-color);
             font-size: 14px;
-            color: #888;
-            margin-top: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom: 3px solid var(--accent);
+        }
+
+        /* Main Content Areas */
+        .view {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 40px;
+        }
+        .view.active { display: block; }
+
+        /* Game View */
+        .game-view {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .counter-box { margin-bottom: 40px; margin-top: 20px; }
+        .counter { font-size: 42px; font-weight: 900; color: var(--accent); margin: 0; text-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
+        .sub-counter { font-size: 16px; color: var(--hint-color); margin-top: 5px; font-weight: 500; }
+        
+        .main-button-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .clicker-btn {
-            font-size: 100px;
+            font-size: 120px;
             background: none;
             border: none;
             cursor: pointer;
-            margin: 20px 0;
-            transition: transform 0.08s ease;
             outline: none;
+            transition: transform 0.05s ease;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            z-index: 2;
         }
-        .clicker-btn:active {
-            transform: scale(0.9);
+        .clicker-btn:active { transform: scale(0.92); }
+
+        /* Floating Particles */
+        .particle {
+            position: fixed;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 20px;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
         }
-        .shop {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
         }
-        .upgrade {
-            background: var(--tg-theme-secondary-bg-color, #1e2621);
-            border: 1px solid #28362d;
+
+        /* Shop View */
+        .shop-list { display: flex; flex-direction: column; gap: 12px; }
+        .shop-item {
+            background-color: var(--bg-sec-color);
+            border: 1px solid #2a382f;
             border-radius: 12px;
-            padding: 12px 14px;
+            padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: transform 0.1s;
         }
-        .upgrade-info h4 {
-            margin: 0 0 4px 0;
-            font-size: 15px;
-        }
-        .upgrade-info p {
-            margin: 0;
-            font-size: 12px;
-            color: #888;
-        }
-        .buy-btn {
-            background-color: #2ecc71;
+        .shop-item:active { transform: scale(0.98); }
+        .item-icon { font-size: 30px; margin-right: 15px; }
+        .item-info { flex: 1; text-align: left; }
+        .item-info h4 { margin: 0 0 4px 0; font-size: 16px; color: var(--text-color); }
+        .item-info p { margin: 0; font-size: 12px; color: var(--hint-color); }
+        .item-buy {
+            background-color: var(--btn-color);
+            color: var(--btn-text-color);
             border: none;
-            color: #000;
-            font-weight: bold;
             padding: 8px 12px;
             border-radius: 8px;
-            font-size: 13px;
+            font-weight: bold;
+            font-size: 14px;
+            min-width: 80px;
             cursor: pointer;
         }
-        .buy-btn:disabled {
-            background-color: #333;
-            color: #666;
-            cursor: not-allowed;
-        }
-        /* Modal & Admin */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 10;
-        }
-        .modal-content {
-            background: #1e2621;
-            padding: 20px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 320px;
-            text-align: center;
-        }
-        .modal-content input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            background: #121614;
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: #fff;
-        }
+        .item-buy:disabled { background-color: #333; color: #666; }
+
+        /* Stats & Achievements View */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background-color: var(--bg-sec-color); padding: 15px; border-radius: 10px; text-align: center; }
+        .stat-card h5 { margin: 0; color: var(--hint-color); font-size: 12px; }
+        .stat-card p { margin: 5px 0 0 0; color: var(--accent); font-weight: bold; font-size: 16px; }
+        .achievement-list { display: flex; flex-direction: column; gap: 8px; }
+        .achievement { background: #2a382f; padding: 10px; border-radius: 8px; opacity: 0.5; display: flex; align-items: center; }
+        .achievement.unlocked { opacity: 1; border-left: 4px solid var(--accent); background: var(--bg-sec-color); }
+        .ach-icon { font-size: 24px; margin-right: 12px; }
+
+        /* Prestige View */
+        .prestige-box { text-align: center; padding: 20px 0; }
+        .prestige-box h2 { color: #f1c40f; }
+        .prestige-btn { background: #f1c40f; color: #000; font-size: 18px; padding: 15px 30px; border: none; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
+
+        /* Modals */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(3px); }
+        .modal-content { background: var(--bg-sec-color); padding: 25px; border-radius: 16px; width: 90%; max-width: 320px; border: 1px solid #333; }
+        .modal input { width: 100%; padding: 12px; margin: 8px 0 15px; background: var(--bg-color); border: 1px solid #444; border-radius: 8px; color: var(--text-color); font-size: 16px; }
+        .btn-full { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; margin-bottom: 8px; color: var(--btn-text-color); background-color: var(--btn-color); }
+        .btn-danger { background-color: #e74c3c; color: white; }
+        .btn-secondary { background-color: #444; color: white; }
         .hidden { display: none !important; }
-        .danger-btn { background: #e74c3c; color: #fff; margin-top: 10px; }
+
+        /* Toast Notifications */
+        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 300; pointer-events: none; }
+        .toast { background-color: var(--accent-dark); color: white; padding: 12px 20px; border-radius: 30px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: slideUp 0.3s ease-out, fadeOut 0.5s ease-in 2.5s forwards; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <span style="font-weight: bold; color: #2ecc71;">Weed Clicker</span>
+        <h1>Weed Clicker Pro</h1>
         <button class="admin-btn" onclick="openModal('login-modal')">⚙️ Admin</button>
     </div>
 
-    <div class="counter-box">
-        <p class="counter"><span id="grams">0</span> g</p>
-        <div class="sub-counter">+<span id="gps">0</span> g/s</div>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('game')">🌿 Ferme</button>
+        <button class="tab-btn" onclick="switchTab('shop')">🛒 Marché</button>
+        <button class="tab-btn" onclick="switchTab('stats')">📊 Stats</button>
+        <button class="tab-btn" onclick="switchTab('prestige')">✨ Prestige</button>
     </div>
 
-    <button class="clicker-btn" id="click-btn">🌿</button>
-
-    <div class="shop">
-        <div class="upgrade">
-            <div class="upgrade-info">
-                <h4>Lampe LED</h4>
-                <p>+1 g/s — Possédés : <span id="count-led">0</span></p>
-            </div>
-            <button class="buy-btn" id="buy-led" onclick="buyItem('led')">Prix : <span id="cost-led">15</span> g</button>
+    <!-- GAME VIEW -->
+    <div id="view-game" class="view active game-view">
+        <div class="counter-box">
+            <p class="counter"><span id="grams-display">0</span> g</p>
+            <div class="sub-counter"><span id="gps-display">0</span> g/s | Clic: <span id="gpc-display">1</span> g</div>
         </div>
-
-        <div class="upgrade">
-            <div class="upgrade-info">
-                <h4>Système Hydro</h4>
-                <p>+8 g/s — Possédés : <span id="count-hydro">0</span></p>
-            </div>
-            <button class="buy-btn" id="buy-hydro" onclick="buyItem('hydro')">Prix : <span id="cost-hydro">100</span> g</button>
-        </div>
-
-        <div class="upgrade">
-            <div class="upgrade-info">
-                <h4>Serre Pro</h4>
-                <p>+40 g/s — Possédés : <span id="count-serre">0</span></p>
-            </div>
-            <button class="buy-btn" id="buy-serre" onclick="buyItem('serre')">Prix : <span id="cost-serre">600</span> g</button>
+        <div class="main-button-container" id="main-btn-container">
+            <button class="clicker-btn" id="click-btn">🌿</button>
         </div>
     </div>
 
-    <!-- Modal Connexion -->
+    <!-- SHOP VIEW -->
+    <div id="view-shop" class="view">
+        <div class="shop-list" id="shop-container">
+            <!-- Injecté via JS -->
+        </div>
+    </div>
+
+    <!-- STATS VIEW -->
+    <div id="view-stats" class="view">
+        <div class="stats-grid">
+            <div class="stat-card"><h5>Total Produit</h5><p id="stat-total">0</p></div>
+            <div class="stat-card"><h5>Clics Totaux</h5><p id="stat-clicks">0</p></div>
+            <div class="stat-card"><h5>Graines Dorées</h5><p id="stat-seeds">0</p></div>
+            <div class="stat-card"><h5>Bonus Prestige</h5><p id="stat-bonus">0%</p></div>
+        </div>
+        <h3 style="margin-top: 10px; font-size: 16px;">🏆 Succès</h3>
+        <div class="achievement-list" id="achievements-container">
+            <!-- Injecté via JS -->
+        </div>
+    </div>
+
+    <!-- PRESTIGE VIEW -->
+    <div id="view-prestige" class="view">
+        <div class="prestige-box">
+            <div style="font-size: 60px; margin-bottom: 10px;">✨</div>
+            <h2>Le Cartel Ultime</h2>
+            <p style="color: var(--hint-color); font-size: 14px; margin-bottom: 20px;">
+                Réinitialisez votre progression actuelle pour gagner des <b>Graines Dorées</b>.<br>
+                Chaque graine augmente votre production globale et vos clics de <b>2%</b>.
+            </p>
+            <div style="background: var(--bg-sec-color); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <p style="margin: 0;">Graines possédées : <b style="color: #f1c40f;" id="prestige-current-seeds">0</b></p>
+            </div>
+            <p>Graines à gagner si vous réinitialisez maintenant :</p>
+            <h3 style="color: #2ecc71; font-size: 30px; margin: 10px 0;" id="prestige-gain">+0</h3>
+            <button class="prestige-btn" id="btn-prestige" onclick="doPrestige()">Prestige !</button>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- MODAL CONNEXION -->
     <div id="login-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>Accès Admin</h3>
+            <h3 style="margin-top:0;">Accès Admin</h3>
             <p id="error-msg" style="color: #e74c3c; font-size: 13px; display: none;">Identifiants incorrects</p>
-            <input type="text" id="admin-id" placeholder="ID">
+            <input type="text" id="admin-id" placeholder="Identifiant" autocapitalize="none">
             <input type="password" id="admin-pass" placeholder="Mot de passe">
-            <button class="buy-btn" style="width: 100%; margin-top: 8px;" onclick="verifyAdmin()">Connexion</button>
-            <button class="admin-btn" style="width: 100%; margin-top: 8px; background: #444;" onclick="closeModal('login-modal')">Annuler</button>
+            <button class="btn-full" onclick="verifyAdmin()">Connexion</button>
+            <button class="btn-full btn-secondary" onclick="closeModal('login-modal')">Annuler</button>
         </div>
     </div>
 
-    <!-- Modal Réglages Admin -->
+    <!-- MODAL REGLAGES ADMIN -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>Configuration Admin</h3>
-            <label style="font-size: 12px; color: #888;">Ajouter des grammes</label>
-            <input type="number" id="add-grams-input" placeholder="Nombre de grammes">
-            <button class="buy-btn" style="width: 100%;" onclick="adminAddGrams()">Valider l'ajout</button>
-            <button class="buy-btn danger-btn" style="width: 100%;" onclick="adminResetGame()">Réinitialiser la partie</button>
-            <button class="admin-btn" style="width: 100%; margin-top: 15px; background: #444;" onclick="closeModal('settings-modal')">Fermer</button>
+            <h3 style="margin-top:0;">Configuration Admin</h3>
+            <input type="number" id="add-grams-input" placeholder="Ajouter des grammes (ex: 1000000)">
+            <button class="btn-full" onclick="adminAddGrams()">Valider l'ajout</button>
+            <input type="number" id="add-seeds-input" placeholder="Ajouter Graines Dorées">
+            <button class="btn-full" onclick="adminAddSeeds()" style="background: #f1c40f; color: #000;">Ajouter Graines</button>
+            <hr style="border: 0.5px solid #444; margin: 20px 0;">
+            <button class="btn-full btn-danger" onclick="adminWipeGame()">Effacer la sauvegarde complète</button>
+            <button class="btn-full btn-secondary" style="margin-top: 10px;" onclick="closeModal('settings-modal')">Fermer</button>
         </div>
     </div>
 
     <script>
+        // Init Telegram
         if (window.Telegram && window.Telegram.WebApp) {
             Telegram.WebApp.ready();
             Telegram.WebApp.expand();
         }
 
-        // Données du jeu
-        let game = {
+        // Base de données objets
+        const SHOP_ITEMS = [
+            { id: 'pot', name: 'Pot en terre', baseCost: 15, gps: 0.5, icon: '🪴' },
+            { id: 'led', name: 'Lampe LED', baseCost: 100, gps: 4, icon: '💡' },
+            { id: 'hydro', name: 'Système Hydro', baseCost: 1100, gps: 32, icon: '💧' },
+            { id: 'serre', name: 'Serre Pro', baseCost: 12000, gps: 260, icon: '⛺' },
+            { id: 'disp', name: 'Dispensaire', baseCost: 130000, gps: 1400, icon: '🏥' },
+            { id: 'cartel', name: 'Cartel', baseCost: 1500000, gps: 7800, icon: '🏢' },
+            { id: 'ile', name: 'Île Privée', baseCost: 20000000, gps: 44000, icon: '🏝️' }
+        ];
+
+        const ACHIEVEMENTS = [
+            { id: 'a1', name: 'Première Feuille', desc: 'Produire 100g au total', req: 100, type: 'total', icon: '🌱' },
+            { id: 'a2', name: 'Petit Dealer', desc: 'Produire 10,000g au total', req: 10000, type: 'total', icon: '🚲' },
+            { id: 'a3', name: 'Baron Local', desc: 'Produire 1,000,000g au total', req: 1000000, type: 'total', icon: '👑' },
+            { id: 'a4', name: 'Clic Frénétique', desc: 'Cliquer 1000 fois', req: 1000, type: 'clicks', icon: '🖱️' },
+            { id: 'a5', name: 'Usine', desc: 'Atteindre 1,000 g/s', req: 1000, type: 'gps', icon: '🏭' },
+            { id: 'a6', name: 'Illuminati', desc: 'Obtenir 1 Graine Dorée', req: 1, type: 'seeds', icon: '✨' }
+        ];
+
+        // État par défaut du jeu
+        let defaultGame = {
             grams: 0,
-            gps: 0,
-            upgrades: {
-                led: { count: 0, cost: 15, rate: 1 },
-                hydro: { count: 0, cost: 100, rate: 8 },
-                serre: { count: 0, cost: 600, rate: 40 }
-            }
+            totalGramsEver: 0,
+            totalClicks: 0,
+            goldenSeeds: 0,
+            buildings: {}, // { id: count }
+            unlockedAchievements: []
         };
 
-        // Sauvegarde locale
-        const saved = localStorage.getItem('weed_clicker_save');
-        if (saved) {
-            try { game = JSON.parse(saved); } catch (e) {}
+        let game = JSON.parse(JSON.stringify(defaultGame));
+        let currentGps = 0;
+        let currentGpc = 1; // Grams per click
+        let prestigeGainCache = 0;
+
+        // Formateur de nombres (1.2k, 1.5M, etc.)
+        function formatNumber(num) {
+            if (num < 1000) return Math.floor(num);
+            const suffixes = ["", "k", "M", "B", "T", "Qa"];
+            const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
+            let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
+            if (shortValue % 1 != 0) shortValue = shortValue.toFixed(1);
+            return shortValue + suffixes[suffixNum];
         }
 
-        function updateUI() {
-            document.getElementById('grams').innerText = Math.floor(game.grams);
-            document.getElementById('gps').innerText = game.gps;
-            
-            for (let key in game.upgrades) {
-                const item = game.upgrades[key];
-                document.getElementById(`count-${key}`).innerText = item.count;
-                document.getElementById(`cost-${key}`).innerText = item.cost;
-                document.getElementById(`buy-${key}`).disabled = game.grams < item.cost;
+        // Chargement Sauvegarde
+        function loadGame() {
+            const saved = localStorage.getItem('weed_clicker_pro_save');
+            if (saved) {
+                try { 
+                    let parsed = JSON.parse(saved); 
+                    game = { ...defaultGame, ...parsed }; // Fusion sécurisée
+                } catch (e) { console.error("Erreur de sauvegarde"); }
             }
+            SHOP_ITEMS.forEach(item => { if (!game.buildings[item.id]) game.buildings[item.id] = 0; });
         }
-
-        // Clic sur la feuille
-        document.getElementById('click-btn').addEventListener('click', () => {
-            game.grams += 1;
-            updateUI();
-        });
-
-        // Achats
-        function buyItem(key) {
-            const item = game.upgrades[key];
-            if (game.grams >= item.cost) {
-                game.grams -= item.cost;
-                item.count += 1;
-                item.cost = Math.floor(item.cost * 1.25);
-                calcGps();
-                updateUI();
-                saveGame();
-            }
-        }
-
-        function calcGps() {
-            game.gps = Object.values(game.upgrades).reduce((acc, cur) => acc + (cur.count * cur.rate), 0);
-        }
-
-        // Boucle de production (chaque seconde)
-        setInterval(() => {
-            if (game.gps > 0) {
-                game.grams += game.gps;
-                updateUI();
-                saveGame();
-            }
-        }, 1000);
 
         function saveGame() {
-            localStorage.setItem('weed_clicker_save', JSON.stringify(game));
+            localStorage.setItem('weed_clicker_pro_save', JSON.stringify(game));
         }
 
-        // Gestion Admin & Modales
+        // Calculs (GpS, Clics, Prix)
+        function getCost(itemId) {
+            const item = SHOP_ITEMS.find(i => i.id === itemId);
+            const count = game.buildings[itemId] || 0;
+            return Math.floor(item.baseCost * Math.pow(1.15, count));
+        }
+
+        function calculateStats() {
+            let baseGps = 0;
+            SHOP_ITEMS.forEach(item => { baseGps += (game.buildings[item.id] || 0) * item.gps; });
+            
+            const multiplier = 1 + (game.goldenSeeds * 0.02); // 2% par graine
+            currentGps = baseGps * multiplier;
+            
+            // Le clic donne 1 de base + 1% du Gps par clic, le tout multiplié
+            let baseClick = 1 + (baseGps * 0.01);
+            currentGpc = baseClick * multiplier;
+
+            // Calcul prestige
+            // Formule: racine cubique de (totalGrams / 1 million)
+            let calculatedSeeds = Math.floor(Math.cbrt(game.totalGramsEver / 1000000));
+            prestigeGainCache = Math.max(0, calculatedSeeds - game.goldenSeeds);
+        }
+
+        // Interface Utilisateur
+        function updateUI() {
+            // Topbar
+            document.getElementById('grams-display').innerText = formatNumber(game.grams);
+            document.getElementById('gps-display').innerText = formatNumber(currentGps);
+            document.getElementById('gpc-display').innerText = formatNumber(currentGpc);
+
+            // Boutique
+            SHOP_ITEMS.forEach(item => {
+                const btn = document.getElementById(`buy-${item.id}`);
+                const cost = getCost(item.id);
+                if (btn) {
+                    btn.innerText = formatNumber(cost) + ' g';
+                    btn.disabled = game.grams < cost;
+                    document.getElementById(`count-${item.id}`).innerText = game.buildings[item.id];
+                }
+            });
+
+            // Stats
+            document.getElementById('stat-total').innerText = formatNumber(game.totalGramsEver);
+            document.getElementById('stat-clicks').innerText = formatNumber(game.totalClicks);
+            document.getElementById('stat-seeds').innerText = formatNumber(game.goldenSeeds);
+            document.getElementById('stat-bonus').innerText = (game.goldenSeeds * 2) + '%';
+
+            // Prestige
+            document.getElementById('prestige-current-seeds').innerText = formatNumber(game.goldenSeeds);
+            document.getElementById('prestige-gain').innerText = '+' + formatNumber(prestigeGainCache);
+            document.getElementById('btn-prestige').disabled = prestigeGainCache <= 0;
+        }
+
+        function buildShop() {
+            const container = document.getElementById('shop-container');
+            container.innerHTML = '';
+            SHOP_ITEMS.forEach(item => {
+                container.innerHTML += `
+                    <div class="shop-item">
+                        <div class="item-icon">${item.icon}</div>
+                        <div class="item-info">
+                            <h4>${item.name}</h4>
+                            <p>+${formatNumber(item.gps)} g/s | Possédés: <span id="count-${item.id}">0</span></p>
+                        </div>
+                        <button class="item-buy" id="buy-${item.id}" onclick="buyItem('${item.id}')">Calcul...</button>
+                    </div>
+                `;
+            });
+        }
+
+        function buildAchievements() {
+            const container = document.getElementById('achievements-container');
+            container.innerHTML = '';
+            ACHIEVEMENTS.forEach(ach => {
+                const unlocked = game.unlockedAchievements.includes(ach.id);
+                container.innerHTML += `
+                    <div class="achievement ${unlocked ? 'unlocked' : ''}" id="ach-${ach.id}">
+                        <div class="ach-icon">${unlocked ? ach.icon : '🔒'}</div>
+                        <div class="item-info">
+                            <h4>${ach.name}</h4>
+                            <p>${ach.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Actions Jeu
+        function spawnParticle(x, y, text) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.innerText = text;
+            particle.style.left = `${x - 20}px`;
+            particle.style.top = `${y - 20}px`;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 1000);
+        }
+
+        document.getElementById('click-btn').addEventListener('pointerdown', (e) => {
+            game.grams += currentGpc;
+            game.totalGramsEver += currentGpc;
+            game.totalClicks++;
+            
+            // Particules
+            let touchX = e.clientX || window.innerWidth / 2;
+            let touchY = e.clientY || window.innerHeight / 3;
+            spawnParticle(touchX, touchY, '+' + formatNumber(currentGpc));
+            
+            calculateStats();
+            updateUI();
+            checkAchievements();
+        });
+
+        function buyItem(id) {
+            const cost = getCost(id);
+            if (game.grams >= cost) {
+                game.grams -= cost;
+                game.buildings[id]++;
+                calculateStats();
+                updateUI();
+                saveGame();
+                checkAchievements();
+            }
+        }
+
+        function doPrestige() {
+            if (prestigeGainCache > 0) {
+                if(confirm(`Voulez-vous réinitialiser vos bâtiments et vos grammes pour gagner ${prestigeGainCache} Graines Dorées ?`)) {
+                    game.goldenSeeds += prestigeGainCache;
+                    game.grams = 0;
+                    game.buildings = {};
+                    SHOP_ITEMS.forEach(item => { game.buildings[item.id] = 0; });
+                    calculateStats();
+                    updateUI();
+                    saveGame();
+                    switchTab('game');
+                    showToast('🌟 Prestige effectué !');
+                }
+            }
+        }
+
+        // Succès et Notifications
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function checkAchievements() {
+            ACHIEVEMENTS.forEach(ach => {
+                if (!game.unlockedAchievements.includes(ach.id)) {
+                    let achieved = false;
+                    if (ach.type === 'total' && game.totalGramsEver >= ach.req) achieved = true;
+                    if (ach.type === 'clicks' && game.totalClicks >= ach.req) achieved = true;
+                    if (ach.type === 'gps' && currentGps >= ach.req) achieved = true;
+                    if (ach.type === 'seeds' && game.goldenSeeds >= ach.req) achieved = true;
+
+                    if (achieved) {
+                        game.unlockedAchievements.push(ach.id);
+                        showToast(`🏆 Succès débloqué : ${ach.name}`);
+                        buildAchievements(); // Refresh UI
+                    }
+                }
+            });
+        }
+
+        // Navigation Onglets
+        function switchTab(tabId) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${tabId}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Admin
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         function verifyAdmin() {
             const id = document.getElementById('admin-id').value;
             const pass = document.getElementById('admin-pass').value;
-            if (id === 'admin' && pass === '0000') {
+            if (id.toLowerCase() === 'admin' && pass === '0000') {
                 closeModal('login-modal');
                 document.getElementById('admin-id').value = '';
                 document.getElementById('admin-pass').value = '';
@@ -295,31 +557,62 @@
         }
 
         function adminAddGrams() {
-            const val = parseInt(document.getElementById('add-grams-input').value, 10);
-            if (!isNaN(val)) {
+            const val = parseFloat(document.getElementById('add-grams-input').value);
+            if (!isNaN(val) && val > 0) {
                 game.grams += val;
+                game.totalGramsEver += val;
+                calculateStats();
                 updateUI();
                 saveGame();
                 document.getElementById('add-grams-input').value = '';
-                alert(`+${val} grammes ajoutés !`);
+                showToast(`🔧 +${formatNumber(val)} g ajoutés`);
             }
         }
 
-        function adminResetGame() {
-            if (confirm("Réinitialiser toute la progression ?")) {
-                game.grams = 0;
-                game.gps = 0;
-                game.upgrades.led = { count: 0, cost: 15, rate: 1 };
-                game.upgrades.hydro = { count: 0, cost: 100, rate: 8 };
-                game.upgrades.serre = { count: 0, cost: 600, rate: 40 };
-                saveGame();
+        function adminAddSeeds() {
+            const val = parseFloat(document.getElementById('add-seeds-input').value);
+            if (!isNaN(val) && val > 0) {
+                game.goldenSeeds += val;
+                calculateStats();
                 updateUI();
-                closeModal('settings-modal');
+                saveGame();
+                document.getElementById('add-seeds-input').value = '';
+                showToast(`🔧 +${formatNumber(val)} Graines ajoutées`);
             }
         }
 
-        calcGps();
+        function adminWipeGame() {
+            if (confirm("ATTENTION : Cela va supprimer TOUTE la progression, y compris les Graines. Sûr ?")) {
+                localStorage.removeItem('weed_clicker_pro_save');
+                location.reload();
+            }
+        }
+
+        // Boucle Principale
+        setInterval(() => {
+            if (currentGps > 0) {
+                // Divise l'ajout par 10 (mise à jour toutes les 100ms) pour une animation de nombre plus fluide
+                const addAmount = currentGps / 10; 
+                game.grams += addAmount;
+                game.totalGramsEver += addAmount;
+                calculateStats();
+                updateUI();
+            }
+        }, 100);
+
+        // Sauvegarde toutes les 5 secondes
+        setInterval(saveGame, 5000);
+        
+        // Check des succès moins fréquent (chaque seconde)
+        setInterval(checkAchievements, 1000);
+
+        // Initialisation
+        loadGame();
+        buildShop();
+        buildAchievements();
+        calculateStats();
         updateUI();
+
     </script>
 </body>
 </html>
