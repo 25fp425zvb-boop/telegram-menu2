@@ -2,87 +2,324 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Configuration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Weed Clicker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #1c1c1e);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--tg-theme-bg-color, #121614);
             color: var(--tg-theme-text-color, #ffffff);
             margin: 0;
+            padding: 16px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
         }
-        .container {
-            width: 85%;
-            max-width: 320px;
-            background-color: var(--tg-theme-secondary-bg-color, #2c2c2e);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            text-align: center;
-        }
-        input {
+        .header {
             width: 100%;
-            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
-            border: 1px solid #3a3a3c;
-            border-radius: 10px;
-            background-color: var(--tg-theme-bg-color, #1c1c1e);
-            color: var(--tg-theme-text-color, #ffffff);
-            box-sizing: border-box;
-            font-size: 16px;
         }
-        button {
-            width: 100%;
-            padding: 14px;
+        .admin-btn {
+            background-color: #27ae60;
             border: none;
-            border-radius: 10px;
-            background-color: var(--tg-theme-button-color, #3390ec);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            font-size: 16px;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
         }
+        .counter-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .counter {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2ecc71;
+            margin: 0;
+        }
+        .sub-counter {
+            font-size: 14px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .clicker-btn {
+            font-size: 100px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: transform 0.08s ease;
+            outline: none;
+        }
+        .clicker-btn:active {
+            transform: scale(0.9);
+        }
+        .shop {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .upgrade {
+            background: var(--tg-theme-secondary-bg-color, #1e2621);
+            border: 1px solid #28362d;
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .upgrade-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 15px;
+        }
+        .upgrade-info p {
+            margin: 0;
+            font-size: 12px;
+            color: #888;
+        }
+        .buy-btn {
+            background-color: #2ecc71;
+            border: none;
+            color: #000;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .buy-btn:disabled {
+            background-color: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+        /* Modal & Admin */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 10;
+        }
+        .modal-content {
+            background: #1e2621;
+            padding: 20px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: #121614;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+        }
         .hidden { display: none !important; }
-        #error-msg { color: #ff3b30; font-size: 14px; margin-bottom: 15px; display: none; }
-        h2 { margin-top: 0; margin-bottom: 20px; }
+        .danger-btn { background: #e74c3c; color: #fff; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="login-page" class="container">
-        <h2>Connexion Admin</h2>
-        <p id="error-msg">Identifiants incorrects.</p>
-        <input type="text" id="userid" placeholder="ID Admin" required>
-        <input type="password" id="password" placeholder="Mot de passe" required>
-        <button onclick="login()">Se connecter</button>
+    <div class="header">
+        <span style="font-weight: bold; color: #2ecc71;">Weed Clicker</span>
+        <button class="admin-btn" onclick="openModal('login-modal')">⚙️ Admin</button>
     </div>
 
-    <div id="admin-page" class="container hidden">
-        <h2>Réglages Poussés</h2>
-        <p>Bienvenue dans le menu de configuration.</p>
-        <button onclick="Telegram.WebApp.close()" style="background-color: #ff3b30; margin-top: 20px;">Fermer</button>
+    <div class="counter-box">
+        <p class="counter"><span id="grams">0</span> g</p>
+        <div class="sub-counter">+<span id="gps">0</span> g/s</div>
+    </div>
+
+    <button class="clicker-btn" id="click-btn">🌿</button>
+
+    <div class="shop">
+        <div class="upgrade">
+            <div class="upgrade-info">
+                <h4>Lampe LED</h4>
+                <p>+1 g/s — Possédés : <span id="count-led">0</span></p>
+            </div>
+            <button class="buy-btn" id="buy-led" onclick="buyItem('led')">Prix : <span id="cost-led">15</span> g</button>
+        </div>
+
+        <div class="upgrade">
+            <div class="upgrade-info">
+                <h4>Système Hydro</h4>
+                <p>+8 g/s — Possédés : <span id="count-hydro">0</span></p>
+            </div>
+            <button class="buy-btn" id="buy-hydro" onclick="buyItem('hydro')">Prix : <span id="cost-hydro">100</span> g</button>
+        </div>
+
+        <div class="upgrade">
+            <div class="upgrade-info">
+                <h4>Serre Pro</h4>
+                <p>+40 g/s — Possédés : <span id="count-serre">0</span></p>
+            </div>
+            <button class="buy-btn" id="buy-serre" onclick="buyItem('serre')">Prix : <span id="cost-serre">600</span> g</button>
+        </div>
+    </div>
+
+    <!-- Modal Connexion -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Accès Admin</h3>
+            <p id="error-msg" style="color: #e74c3c; font-size: 13px; display: none;">Identifiants incorrects</p>
+            <input type="text" id="admin-id" placeholder="ID">
+            <input type="password" id="admin-pass" placeholder="Mot de passe">
+            <button class="buy-btn" style="width: 100%; margin-top: 8px;" onclick="verifyAdmin()">Connexion</button>
+            <button class="admin-btn" style="width: 100%; margin-top: 8px; background: #444;" onclick="closeModal('login-modal')">Annuler</button>
+        </div>
+    </div>
+
+    <!-- Modal Réglages Admin -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Configuration Admin</h3>
+            <label style="font-size: 12px; color: #888;">Ajouter des grammes</label>
+            <input type="number" id="add-grams-input" placeholder="Nombre de grammes">
+            <button class="buy-btn" style="width: 100%;" onclick="adminAddGrams()">Valider l'ajout</button>
+            <button class="buy-btn danger-btn" style="width: 100%;" onclick="adminResetGame()">Réinitialiser la partie</button>
+            <button class="admin-btn" style="width: 100%; margin-top: 15px; background: #444;" onclick="closeModal('settings-modal')">Fermer</button>
+        </div>
     </div>
 
     <script>
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
+        if (window.Telegram && window.Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+        }
 
-        function login() {
-            const user = document.getElementById('userid').value;
-            const pass = document.getElementById('password').value;
+        // Données du jeu
+        let game = {
+            grams: 0,
+            gps: 0,
+            upgrades: {
+                led: { count: 0, cost: 15, rate: 1 },
+                hydro: { count: 0, cost: 100, rate: 8 },
+                serre: { count: 0, cost: 600, rate: 40 }
+            }
+        };
 
-            if (user === 'admin' && pass === '0000') {
-                document.getElementById('login-page').classList.add('hidden');
-                document.getElementById('admin-page').classList.remove('hidden');
+        // Sauvegarde locale
+        const saved = localStorage.getItem('weed_clicker_save');
+        if (saved) {
+            try { game = JSON.parse(saved); } catch (e) {}
+        }
+
+        function updateUI() {
+            document.getElementById('grams').innerText = Math.floor(game.grams);
+            document.getElementById('gps').innerText = game.gps;
+            
+            for (let key in game.upgrades) {
+                const item = game.upgrades[key];
+                document.getElementById(`count-${key}`).innerText = item.count;
+                document.getElementById(`cost-${key}`).innerText = item.cost;
+                document.getElementById(`buy-${key}`).disabled = game.grams < item.cost;
+            }
+        }
+
+        // Clic sur la feuille
+        document.getElementById('click-btn').addEventListener('click', () => {
+            game.grams += 1;
+            updateUI();
+        });
+
+        // Achats
+        function buyItem(key) {
+            const item = game.upgrades[key];
+            if (game.grams >= item.cost) {
+                game.grams -= item.cost;
+                item.count += 1;
+                item.cost = Math.floor(item.cost * 1.25);
+                calcGps();
+                updateUI();
+                saveGame();
+            }
+        }
+
+        function calcGps() {
+            game.gps = Object.values(game.upgrades).reduce((acc, cur) => acc + (cur.count * cur.rate), 0);
+        }
+
+        // Boucle de production (chaque seconde)
+        setInterval(() => {
+            if (game.gps > 0) {
+                game.grams += game.gps;
+                updateUI();
+                saveGame();
+            }
+        }, 1000);
+
+        function saveGame() {
+            localStorage.setItem('weed_clicker_save', JSON.stringify(game));
+        }
+
+        // Gestion Admin & Modales
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function verifyAdmin() {
+            const id = document.getElementById('admin-id').value;
+            const pass = document.getElementById('admin-pass').value;
+            if (id === 'admin' && pass === '0000') {
+                closeModal('login-modal');
+                document.getElementById('admin-id').value = '';
+                document.getElementById('admin-pass').value = '';
+                document.getElementById('error-msg').style.display = 'none';
+                openModal('settings-modal');
             } else {
                 document.getElementById('error-msg').style.display = 'block';
             }
         }
+
+        function adminAddGrams() {
+            const val = parseInt(document.getElementById('add-grams-input').value, 10);
+            if (!isNaN(val)) {
+                game.grams += val;
+                updateUI();
+                saveGame();
+                document.getElementById('add-grams-input').value = '';
+                alert(`+${val} grammes ajoutés !`);
+            }
+        }
+
+        function adminResetGame() {
+            if (confirm("Réinitialiser toute la progression ?")) {
+                game.grams = 0;
+                game.gps = 0;
+                game.upgrades.led = { count: 0, cost: 15, rate: 1 };
+                game.upgrades.hydro = { count: 0, cost: 100, rate: 8 };
+                game.upgrades.serre = { count: 0, cost: 600, rate: 40 };
+                saveGame();
+                updateUI();
+                closeModal('settings-modal');
+            }
+        }
+
+        calcGps();
+        updateUI();
     </script>
 </body>
 </html>
