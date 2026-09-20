@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Configuration</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #1c1c1e);
+            color: var(--tg-theme-text-color, #ffffff);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            width: 85%;
+            max-width: 320px;
+            background-color: var(--tg-theme-secondary-bg-color, #2c2c2e);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #3a3a3c;
+            border-radius: 10px;
+            background-color: var(--tg-theme-bg-color, #1c1c1e);
+            color: var(--tg-theme-text-color, #ffffff);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .hidden { display: none !important; }
+        #error-msg { color: #ff3b30; font-size: 14px; margin-bottom: 15px; display: none; }
+        h2 { margin-top: 0; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="login-page" class="container">
+        <h2>Connexion Admin</h2>
+        <p id="error-msg">Identifiants incorrects.</p>
+        <input type="text" id="userid" placeholder="ID Admin" required>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+        <button onclick="login()">Se connecter</button>
+    </div>
+
+    <div id="admin-page" class="container hidden">
+        <h2>Réglages Poussés</h2>
+        <p>Bienvenue dans le menu de configuration.</p>
+        <button onclick="Telegram.WebApp.close()" style="background-color: #ff3b30; margin-top: 20px;">Fermer</button>
+    </div>
+
+    <script>
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+
+        function login() {
+            const user = document.getElementById('userid').value;
+            const pass = document.getElementById('password').value;
+
+            if (user === 'admin' && pass === '0000') {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('admin-page').classList.remove('hidden');
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
