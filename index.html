@@ -30,6 +30,7 @@
         .top-bar { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; background: rgba(5,5,7,0.8); backdrop-filter: blur(10px); z-index: 10; }
         .header-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .header-title h1 { margin: 0; font-size: 1.2rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+        
         .admin-icon { font-size: 20px; cursor: pointer; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); transition: 0.2s; }
         .admin-icon:active { transform: rotate(90deg) scale(1.1); }
 
@@ -37,6 +38,7 @@
         .stat-badge { background: var(--bg-surface); flex: 1; padding: 10px 5px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
         .stat-badge span { font-size: 8px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
         .stat-badge strong { font-size: 14px; font-weight: 900; }
+        
         .val-weed { color: var(--neon-green); text-shadow: 0 0 8px rgba(57, 255, 20, 0.4); }
         .val-cash { color: var(--neon-gold); text-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
         .val-rep { color: var(--neon-blue); text-shadow: 0 0 8px rgba(0, 243, 255, 0.4); }
@@ -60,10 +62,16 @@
         .clicker-zone { text-align: center; padding: 30px 0; background: radial-gradient(circle, rgba(57, 255, 20, 0.05) 0%, rgba(0,0,0,0) 70%); margin-bottom: 20px; position: relative;}
         .clicker-zone::after { content:''; position: absolute; bottom: 0; left: 10%; width: 80%; height: 1px; background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.2), transparent); }
         .clicker-btn { width: 140px; height: 140px; border-radius: 50%; background: var(--bg-card); border: 2px solid rgba(255,255,255,0.1); font-size: 60px; color: #fff; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.1s; position: relative; z-index: 1;}
+        
         .clicker-btn:active { transform: scale(0.92); border-color: rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .clicker-btn.sim-active { transform: scale(0.92); border-color: rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .clicker-zone .clicker-btn::before { content:''; position:absolute; top:-5px; left:-5px; width:150px; height:150px; border-radius:50%; background: var(--neon-green); opacity: 0.1; filter: blur(10px); z-index: -1;}
         .rate-display { font-size: 11px; font-weight: 700; color: #fff; margin-top: 20px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 20px; display: inline-block; border: 1px solid rgba(57, 255, 20, 0.2); }
+
+        .drying-container { background: rgba(0,0,0,0.5); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-top: 15px; text-align: left; }
+        .drying-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        .drying-bar-bg { background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden; position: relative; }
+        .drying-bar-fill { background: var(--neon-green); height: 100%; width: 0%; box-shadow: 0 0 10px var(--neon-green); transition: width 0.1s linear; }
 
         /* --- STREET (SHOP) --- */
         .section-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin: 25px 0 15px 5px; display: flex; align-items: center; gap: 8px; }
@@ -75,6 +83,7 @@
         .card-icon { font-size: 30px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px; flex-shrink: 0; }
         .card-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .card-info h4 { margin: 0 0 4px 0; font-size: 14px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: space-between; }
+        
         .card-info p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600; line-height: 1.4; }
         .card-buy { padding: 10px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; border: none; cursor: pointer; text-transform: uppercase; transition: 0.1s; flex-shrink: 0; }
         .card-buy:active { transform: scale(0.95); }
@@ -90,6 +99,7 @@
         .chat-list-view { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
         .chat-preview { background: var(--bg-card); padding: 15px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; gap: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; }
         .chat-preview:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
+        
         .chat-preview.threat { border-left: 4px solid var(--neon-red); }
         .chat-preview-icon { font-size: 24px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); border-radius: 50%; flex-shrink: 0; }
         .chat-preview-info { flex: 1; overflow: hidden; }
@@ -101,6 +111,7 @@
         .chat-detail-view.active { display: flex; animation: slideInRight 0.3s ease-out; }
         @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .chat-detail-header { background: rgba(0, 0, 0, 0.9); border-bottom: 1px solid var(--border-light); padding: 15px 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-shrink: 0; }
+        
         .btn-back { background: none; border: none; color: var(--neon-blue); font-size: 20px; cursor: pointer; padding: 0 10px 0 0; }
         .chat-thread-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .chat-msg { padding: 12px 16px; border-radius: 18px; font-size: 13px; font-weight: 600; width: fit-content; max-width: 85%; line-height: 1.4; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -131,10 +142,11 @@
         .modal-input { width: 100%; padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff; font-weight: 600; font-size: 14px;}
         .modal-input:focus { outline: none; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
         .btn-full { width: 100%; padding: 14px; margin-top: 15px; border-radius: 12px; font-weight: 800; text-transform: uppercase; cursor: pointer; border: none; font-size: 13px;}
+        
         .bg-green { background: var(--neon-green); color: black; box-shadow: 0 0 15px rgba(57,255,20,0.3); }
         .bg-red { background: var(--neon-red); box-shadow: 0 0 15px rgba(255,0,60,0.4); }
-        .bg-gray { background: rgba(255,255,255,0.1); }
-        .bg-purple { background: linear-gradient(90deg, #8b5cf6, #d946ef); box-shadow: 0 0 15px rgba(217, 70, 239, 0.4); }
+        .bg-gray { background: rgba(255,255,255,0.1); color: white; }
+        .bg-purple { background: linear-gradient(90deg, #8b5cf6, #d946ef); box-shadow: 0 0 15px rgba(217, 70, 239, 0.4); color: white; }
         
         /* TOAST NOTIFICATIONS */
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.95); padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 800; text-align: center; width: 85%; max-width: 350px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: slideDownToast 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -145,6 +157,7 @@
         .music-title { font-size: 11px; color: var(--neon-blue); font-weight: 900; text-transform: uppercase; margin-bottom: 10px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .music-controls { display: flex; justify-content: space-center; align-items: center; gap: 15px; justify-content: center; margin-bottom: 15px; }
         .music-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
         .music-btn:active { transform: scale(0.9); }
         .volume-slider { width: 100%; appearance: none; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; outline: none; }
         .volume-slider::-webkit-slider-thumb { appearance: none; width: 15px; height: 15px; border-radius: 50%; background: var(--neon-blue); cursor: pointer; }
@@ -177,7 +190,7 @@
             <p id="auth-error" style="color:var(--neon-red); font-size:11px; font-weight:700; text-align:center; display:none;"></p>
             <button class="btn-full" style="background:var(--neon-blue); color:black;" onclick="loginUser()">Se Connecter</button>
             <button class="btn-full bg-green" onclick="registerUser()">S'inscrire</button>
-            <div style="font-size:9px; color:var(--text-muted); margin-top:20px; text-align:center;">GitHub Pages Edition (Fake Auth)</div>
+            <div style="font-size:9px; color:var(--text-muted); margin-top:20px; text-align:center;">Local Edition (Fake Auth)</div>
         </div>
     </div>
 
@@ -243,6 +256,18 @@
             <div class="clicker-zone">
                 <button class="clicker-btn" id="btn-grow">🌿</button>
                 <div class="rate-display">Production : +<span id="ui-gps">0</span> g/s</div>
+                
+                <!-- NEW DRYING UI -->
+                <div class="drying-container">
+                    <div class="drying-header">
+                        <span>En séchage : <b id="ui-drying-amt" style="color:#fff;">0 g</b></span>
+                        <span id="ui-drying-time" style="color:var(--neon-green);">30s</span>
+                    </div>
+                    <div class="drying-bar-bg">
+                        <div class="drying-bar-fill" id="ui-drying-bar"></div>
+                    </div>
+                </div>
+
             </div>
             <h2 class="section-title">Infrastructures du local</h2>
             <div class="list-container" id="grow-shop"></div>
@@ -405,7 +430,7 @@
         <div class="modal-content">
             <h3 style="color: var(--neon-green);">Réseau SYS</h3>
             
-            <button class="btn-full" style="background:#444;" onclick="adminListUsers()">Lister Utilisateurs Inscrits</button>
+            <button class="btn-full" style="background:#444; color: white;" onclick="adminListUsers()">Lister Utilisateurs Inscrits</button>
             
             <label style="font-size: 11px; font-weight:800; color: var(--text-muted); letter-spacing:1px; margin-top:20px; display:block;">INJECTER CASH ($)</label>
             <input type="number" id="add-cash-input" placeholder="Montant">
@@ -463,6 +488,7 @@
             { id: 'dealer', name: 'Dealer', cost: 4500, rate: 1.2, type: 'auto', icon: '🚲', desc: 'Auto : 1.2 g/s', maxLevel: 50 },
             { id: 'four', name: 'Point de Deal', cost: 25000, rate: 6, type: 'auto', icon: '🔥', desc: 'Auto : 6 g/s', maxLevel: 25 }
         ];
+        
         const NETWORK_ITEMS = [
             { id: 'chimiste', name: 'El Chemisto', baseCostRep: 10, bonusType: 'grow', icon: '👨‍🔬', desc: 'Prod. +50% / lvl', maxLevel: 10 },
             { id: 'comptable', name: 'Le Blanchisseur', baseCostRep: 15, bonusType: 'heat', icon: '📊', desc: 'Police ralentie 20%/lvl', maxLevel: 10 },
@@ -499,7 +525,8 @@
         const GAME_LAUNCH_TIME = 1716307200000; // 21 May 2024 (Fictional start date)
 
         // --- STATE ---
-        let game = { weed: 0, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 };
+        // Added dryingWeed and dryingTimer to state
+        let game = { weed: 0, dryingWeed: 0, dryingTimer: 30, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 };
         let currentGps = 0; let currentSps = 0; let currentPrice = 3.5; let clickGpc = 1; let clickSpc = 1;
         let adminAutoClickerOn = false; let gangBonusDeadline = 0; let vipBonusDeadline = 0;
         let currentTrackIdx = 0; let isMusicPlaying = false; let currentOpenChatUid = null;
@@ -551,7 +578,7 @@
         }
 
         function logoutUser() {
-            game = { weed: 0, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 }; // Clear temp game
+            game = { weed: 0, dryingWeed: 0, dryingTimer: 30, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 }; // Clear temp game
             localStorage.removeItem('cartel_logged_user');
             closeModal('player-settings-modal');
             location.reload(); // Hard reload to auth screen
@@ -576,9 +603,13 @@
                 let parsed = JSON.parse(save);
                 game = { ...game, ...parsed }; 
                 game.activeEvents.forEach(ev => { if(!ev.history) { ev.history = [{ sender: 'them', text: ev.initText || ev.text }]; } });
+                
+                // Ensure drying properties exist for old saves
+                if (game.dryingWeed === undefined) game.dryingWeed = 0;
+                if (game.dryingTimer === undefined || isNaN(game.dryingTimer)) game.dryingTimer = 30;
             } else {
                 // Initialize default save for new user
-                game = { weed: 0, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 };
+                game = { weed: 0, dryingWeed: 0, dryingTimer: 30, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 };
                 [...GROW_ITEMS, ...SELL_ITEMS, ...NETWORK_ITEMS].forEach(i => game.inventory[i.id] = 0);
             }
             checkSeasonReset();
@@ -630,6 +661,12 @@
             document.getElementById('ui-sps').innerText = formatVal(currentSps);
             document.getElementById('bribe-cost').innerText = formatVal(getBribeCost());
             document.getElementById('btn-buy-vigile').disabled = game.cash < 2000;
+            
+            // Updating Drying UI
+            document.getElementById('ui-drying-amt').innerText = formatVal(game.dryingWeed) + ' g';
+            document.getElementById('ui-drying-time').innerText = Math.ceil(game.dryingTimer) + 's';
+            let progress = ((30 - game.dryingTimer) / 30) * 100;
+            document.getElementById('ui-drying-bar').style.width = Math.max(0, Math.min(100, progress)) + '%';
         }
 
         // --- FORMAT ---
@@ -667,7 +704,7 @@
             // If the player's save is from an older season, trigger RESET
             if (game.lastSeasonPlayed < currentGlobalSeason) {
                 game.lastSeasonPlayed = currentGlobalSeason;
-                game.weed = 0; game.cash = 0; game.heat = 0; game.debt = 0;
+                game.weed = 0; game.dryingWeed = 0; game.cash = 0; game.heat = 0; game.debt = 0;
                 game.debtDeadline = 0; game.pendingDebt = 0; game.gangTrackerDeadline = 0; game.sellTransactionCount = 0;
                 game.activeEvents = [];
                 // Reset standard inventory, but KEEP VIP Levels
@@ -696,9 +733,14 @@
             const p = document.createElement('div'); p.className = 'particle'; p.innerText = text; p.style.color = colorHex; p.style.left = x + 'px'; p.style.top = y + 'px';
             document.body.appendChild(p); setTimeout(()=>p.remove(), 1000);
         }
+        
+        // Modification: Clicking now adds to dryingWeed
         document.getElementById('btn-grow').addEventListener('pointerdown', (e) => {
-            game.weed += clickGpc; spawnAnim(e.clientX, e.clientY, '+'+formatVal(clickGpc)+'g', 'var(--neon-green)'); updateUI();
+            game.dryingWeed += clickGpc; 
+            spawnAnim(e.clientX, e.clientY, '+'+formatVal(clickGpc)+'g', 'var(--neon-green)'); 
+            updateUI();
         });
+        
         document.getElementById('btn-sell').addEventListener('pointerdown', (e) => {
             let qtyToSell = Math.min(game.weed, clickSpc);
             if(qtyToSell >= 1) {
@@ -760,6 +802,7 @@
             renderChatDetail(); document.getElementById('phone-detail-view').classList.add('active');
         }
         function closeChat() { document.getElementById('phone-detail-view').classList.remove('active'); currentOpenChatUid = null; }
+        
         function renderChatDetail() {
             if(!currentOpenChatUid) return; const ev = game.activeEvents.find(e => e.uid === currentOpenChatUid); if(!ev) { closeChat(); return; }
             document.getElementById('detail-thread').innerHTML = ev.history.map(msg => `<div class="chat-msg ${msg.sender === 'me' ? 'chat-me' : 'chat-them'}">${msg.text}</div>`).join('');
@@ -803,7 +846,21 @@
 
         // --- GAME LOOP ---
         setInterval(() => {
-            if (currentGps > 0) game.weed += currentGps / 10;
+            // Modification: Auto generation goes to dryingWeed
+            if (currentGps > 0) game.dryingWeed += currentGps / 10;
+            if (adminAutoClickerOn) game.dryingWeed += clickGpc * 10;
+
+            // Drying Logic
+            game.dryingTimer -= 0.1;
+            if (game.dryingTimer <= 0) {
+                if (game.dryingWeed > 0) {
+                    game.weed += game.dryingWeed;
+                    showToast(`🌿 +${formatVal(game.dryingWeed)}g prêts à la vente !`, "var(--neon-green)");
+                    game.dryingWeed = 0;
+                }
+                game.dryingTimer = 30; // Reset
+            }
+
             if (currentSps > 0 && game.weed > 0) { let amount = Math.min(currentSps/10, game.weed); game.weed -= amount; game.cash += amount * currentPrice; game.sellTransactionCount += 0.1; }
             if (game.sellTransactionCount >= 15) { let chunks = Math.floor(game.sellTransactionCount / 15); game.sellTransactionCount %= 15; if (game.vigileDeadline < Date.now()) { game.heat += chunks * 5; if (game.inventory['comptable']) game.heat *= Math.pow(0.8, game.inventory['comptable']); } }
             updateUI();
