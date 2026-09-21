@@ -3,616 +3,1410 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Weed Clicker Pro</title>
+    <title>Cartel Tycoon : Street Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Variables natives Telegram et Thème */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&display=swap');
+
+        /* --- DESIGN SYSTEM : URBAN NEON --- */
         :root {
-            --bg-color: var(--tg-theme-bg-color, #121614);
-            --bg-sec-color: var(--tg-theme-secondary-bg-color, #1e2621);
-            --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #888888);
-            --btn-color: var(--tg-theme-button-color, #2ecc71);
-            --btn-text-color: var(--tg-theme-button-text-color, #000000);
-            --accent: #2ecc71;
-            --accent-dark: #27ae60;
+            --bg-base: #050507;
+            --bg-surface: rgba(12, 12, 15, 0.85);
+            --bg-card: linear-gradient(145deg, #121217 0%, #0d0d11 100%);
+            --neon-green: #39ff14;
+            --neon-gold: #ffd700;
+            --neon-blue: #00f3ff;
+            --neon-red: #ff003c;
+            --neon-purple: #b026ff;
+            --text-main: #ffffff;
+            --text-muted: #6b6b7b;
+            --border-light: rgba(255, 255, 255, 0.05);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
         }
 
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: 'Montserrat', sans-serif; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            background-color: var(--bg-base); color: var(--text-main); margin: 0; padding: 0;
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            background-image: 
+                linear-gradient(rgba(10, 10, 12, 0.9), rgba(10, 10, 12, 0.9)),
+                repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255,255,255,0.03) 50px),
+                repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(255,255,255,0.03) 50px);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
         }
 
-        /* Header & Admin */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background-color: var(--bg-sec-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            z-index: 5;
+        /* --- HEADER STATS --- */
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0; background: rgba(10, 10, 12, 0.85);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            z-index: 50; border-bottom: 1px solid var(--border-light);
+            display: flex; flex-direction: column; padding: 15px 20px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.8);
         }
-        .header h1 { margin: 0; font-size: 18px; color: var(--accent); }
-        .admin-btn {
-            background-color: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
+        .header-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .header-title h1 { margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #fff; font-style: italic; text-shadow: 2px 2px 0px var(--neon-red); }
+        .admin-icon { font-size: 20px; cursor: pointer; opacity: 0.7; transition: 0.2s; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+        .admin-icon:active { opacity: 1; transform: rotate(90deg); }
+        
+        .stats-row { display: flex; justify-content: space-between; gap: 10px; }
+        .stat-badge {
+            background: var(--bg-surface); flex: 1; padding: 10px 5px; border-radius: 12px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;
         }
+        .stat-badge::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%); pointer-events: none; }
+        .stat-badge span { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-badge strong { font-size: 15px; font-weight: 900; margin-top: 4px; z-index: 1; }
+        .val-weed { color: var(--neon-green); text-shadow: 0 0 8px rgba(57, 255, 20, 0.4); }
+        .val-cash { color: var(--neon-gold); text-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
+        .val-rep { color: var(--neon-blue); text-shadow: 0 0 8px rgba(0, 243, 255, 0.4); }
+        .val-heat { color: var(--neon-red); text-shadow: 0 0 8px rgba(255, 0, 60, 0.4); }
 
-        /* Tabs Navigation */
+        /* VIP BADGE */
+        .vip-badge-header { display: none; font-size: 10px; font-weight: 900; background: linear-gradient(90deg, #ffd700, #ff8c00); -webkit-background-clip: text; color: transparent; margin-left: 5px; animation: shine 2s infinite linear; }
+        @keyframes shine { 0% { filter: brightness(1); } 50% { filter: brightness(1.5); text-shadow: 0 0 10px rgba(255,215,0,0.5); } 100% { filter: brightness(1); } }
+
+        /* --- MAIN CONTAINER --- */
+        .main-container { flex: 1; margin-top: 130px; margin-bottom: 85px; overflow-y: auto; position: relative; padding: 0 20px; }
+        .view { display: none; padding-bottom: 20px; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .view.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CLICKER ZONES --- */
+        .clicker-zone {
+            background: var(--bg-card); border-radius: 24px; padding: 30px; text-align: center; 
+            border: 1px solid var(--border-light); margin-bottom: 25px; 
+            box-shadow: var(--glass-shadow), inset 0 2px 1px rgba(255,255,255,0.05);
+            position: relative; overflow: hidden;
+        }
+        .clicker-zone::after {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 150px; height: 150px; border-radius: 50%; filter: blur(50px); z-index: 0; pointer-events: none;
+        }
+        #view-lab .clicker-zone::after { background: rgba(57, 255, 20, 0.15); }
+        #view-street .clicker-zone::after { background: rgba(255, 215, 0, 0.15); }
+
+        .clicker-btn {
+            font-size: 85px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); 
+            border-radius: 50%; width: 140px; height: 140px; display: inline-flex; align-items: center; justify-content: center;
+            outline: none; cursor: pointer; transition: all 0.1s; position: relative; z-index: 1;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 4px 10px rgba(255,255,255,0.1);
+        }
+        .clicker-btn:active, .clicker-btn.sim-active { 
+            transform: scale(0.92) translateY(5px); 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5), inset 0 6px 15px rgba(0,0,0,0.8); 
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        /* --- PHONE / MESSAGES APP UI --- */
+        #view-phone { padding: 0; display: none; flex-direction: column; height: calc(100vh - 130px - 70px); position: relative; }
+        #view-phone.active { display: flex; animation: slideUp 0.3s ease-out; }
+        
+        .phone-header {
+            background: rgba(0, 0, 0, 0.8); border-bottom: 1px solid var(--border-light);
+            padding: 15px 20px; text-align: center; font-weight: 900; letter-spacing: 1px;
+            text-transform: uppercase; color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
+            position: relative; z-index: 10;
+        }
+        
+        .chat-list-view { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        
+        /* Compact List Item */
+        .chat-preview {
+            background: var(--bg-card); padding: 15px; border-radius: 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; gap: 15px;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s;
+        }
+        .chat-preview:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
+        .chat-preview.threat { border-left: 4px solid var(--neon-red); }
+        .chat-preview-icon { font-size: 24px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); border-radius: 50%; flex-shrink: 0; }
+        .chat-preview-info { flex: 1; overflow: hidden; }
+        .chat-preview-name { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-preview.threat .chat-preview-name { color: var(--neon-red); }
+        .chat-preview-text { font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-unread { width: 10px; height: 10px; background: var(--neon-blue); border-radius: 50%; box-shadow: 0 0 8px var(--neon-blue); flex-shrink: 0; }
+
+        /* Detail View */
+        .chat-detail-view {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-base); display: none; flex-direction: column; z-index: 20;
+            background-image: inherit; background-size: inherit;
+        }
+        .chat-detail-view.active { display: flex; animation: slideInRight 0.3s ease-out; }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .chat-detail-header {
+            background: rgba(0, 0, 0, 0.9); border-bottom: 1px solid var(--border-light);
+            padding: 15px 20px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-shrink: 0;
+        }
+        .btn-back { background: none; border: none; color: var(--neon-blue); font-size: 20px; cursor: pointer; padding: 0 10px 0 0; }
+        
+        .chat-thread-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .chat-msg { padding: 12px 16px; border-radius: 18px; font-size: 13px; font-weight: 600; width: fit-content; max-width: 85%; line-height: 1.4; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .chat-them { background: var(--bg-card); color: #ddd; border-bottom-left-radius: 4px; align-self: flex-start; border: 1px solid rgba(255,255,255,0.05); }
+        .chat-me { background: rgba(0,243,255,0.1); color: var(--neon-blue); border-bottom-right-radius: 4px; align-self: flex-end; border: 1px solid rgba(0,243,255,0.2); }
+
+        .chat-actions-container { background: rgba(10,10,12,0.95); padding: 15px; border-top: 1px solid var(--border-light); flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding-bottom: 25px; }
+
+        .msg-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-msg { flex: 1; min-width: 30%; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 11px; border: none; cursor: pointer; text-transform: uppercase; transition: 0.1s;}
+        .btn-msg:active { transform: scale(0.95); }
+        .btn-accept { background: rgba(57, 255, 20, 0.1); color: var(--neon-green); border: 1px solid rgba(57, 255, 20, 0.3); }
+        .btn-decline { background: rgba(255, 0, 60, 0.1); color: var(--neon-red); border: 1px solid rgba(255, 0, 60, 0.3); }
+        .btn-nego { background: rgba(255, 215, 0, 0.1); color: var(--neon-gold); border: 1px solid rgba(255, 215, 0, 0.3); }
+
+        /* --- TABS (BOTTOM NAV) --- */
         .tabs {
-            display: flex;
-            background-color: var(--bg-sec-color);
-            border-bottom: 1px solid #333;
+            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 12, 0.9);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.05); display: flex;
+            padding-bottom: env(safe-area-inset-bottom, 15px); z-index: 50;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
         .tab-btn {
-            flex: 1;
-            padding: 12px 0;
-            background: none;
-            border: none;
-            color: var(--hint-color);
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
+            flex: 1; padding: 15px 0; background: none; border: none; color: var(--text-muted);
+            font-size: 10px; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 6px;
+            position: relative; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
         }
-        .tab-btn.active {
-            color: var(--accent);
-            border-bottom: 3px solid var(--accent);
-        }
+        .tab-icon { font-size: 22px; filter: grayscale(100%) opacity(0.5); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .tab-btn.active { color: #fff; }
+        .tab-btn.active .tab-icon { filter: grayscale(0%) opacity(1); transform: translateY(-4px) scale(1.1); text-shadow: 0 0 15px rgba(255,255,255,0.5); }
+        .notif-dot { position: absolute; top: 10px; right: 28%; width: 10px; height: 10px; background: var(--neon-red); border-radius: 50%; display: none; box-shadow: 0 0 12px var(--neon-red); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
-        /* Main Content Areas */
-        .view {
-            display: none;
-            flex: 1;
+        /* --- MODALS --- */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(10px); }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { 
+            background: var(--bg-card); padding: 30px; border-radius: 24px; width: 90%; max-width: 340px; 
+            border: 1px solid rgba(255,255,255,0.1); transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            max-height: 85vh;
             overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 40px;
         }
-        .view.active { display: block; }
+        .modal.active .modal-content { transform: scale(1); }
+        .modal h3 { margin-top: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .modal input { width: 100%; padding: 15px; margin: 10px 0 20px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; font-size: 16px; font-weight: 700; outline: none; transition: 0.2s;}
+        .modal input:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(57,255,20,0.2); }
+        .btn-full { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 900; font-size: 14px; margin-bottom: 12px; cursor: pointer; color: white; text-transform: uppercase; transition: 0.2s; }
+        .btn-full:active { transform: scale(0.96); }
+        .bg-green { background: var(--neon-green); color: black; box-shadow: 0 0 15px rgba(57,255,20,0.4); }
+        .bg-red { background: var(--neon-red); box-shadow: 0 0 15px rgba(255,0,60,0.4); }
+        .bg-gray { background: rgba(255,255,255,0.1); }
+        .bg-purple { background: linear-gradient(90deg, #8b5cf6, #d946ef); box-shadow: 0 0 15px rgba(217, 70, 239, 0.4); }
 
-        /* Game View */
-        .game-view {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
+        /* --- WANTED OVERLAY --- */
+        #wanted-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.9); animation: policeLights 0.4s infinite;
         }
-        .counter-box { margin-bottom: 40px; margin-top: 20px; }
-        .counter { font-size: 42px; font-weight: 900; color: var(--accent); margin: 0; text-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
-        .sub-counter { font-size: 16px; color: var(--hint-color); margin-top: 5px; font-weight: 500; }
+        #wanted-overlay.active { display: flex; }
+        .wanted-text { font-size: 60px; font-weight: 900; color: white; text-transform: uppercase; text-shadow: 0 0 30px var(--neon-red), 0 0 10px white; letter-spacing: 5px; margin-bottom: 10px; font-style: italic;}
+        .wanted-sub { font-size: 16px; color: white; font-weight: 700; background: black; padding: 5px 15px; text-transform: uppercase; }
         
-        .main-button-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .clicker-btn {
-            font-size: 120px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            outline: none;
-            transition: transform 0.05s ease;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-            z-index: 2;
-        }
-        .clicker-btn:active { transform: scale(0.92); }
-
-        /* Floating Particles */
-        .particle {
-            position: fixed;
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 20px;
-            pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
-            z-index: 100;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+        @keyframes policeLights {
+            0% { background: rgba(255, 0, 60, 0.3); }
+            50% { background: rgba(0, 243, 255, 0.3); }
+            100% { background: rgba(255, 0, 60, 0.3); }
         }
 
-        /* Shop View */
-        .shop-list { display: flex; flex-direction: column; gap: 12px; }
-        .shop-item {
-            background-color: var(--bg-sec-color);
-            border: 1px solid #2a382f;
-            border-radius: 12px;
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.1s;
+        /* --- BANNERS FOR TIMERS --- */
+        .status-banner {
+            background: rgba(10, 10, 12, 0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; font-weight: 800;
+            border-radius: 12px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: none;
         }
-        .shop-item:active { transform: scale(0.98); }
-        .item-icon { font-size: 30px; margin-right: 15px; }
-        .item-info { flex: 1; text-align: left; }
-        .item-info h4 { margin: 0 0 4px 0; font-size: 16px; color: var(--text-color); }
-        .item-info p { margin: 0; font-size: 12px; color: var(--hint-color); }
-        .item-buy {
-            background-color: var(--btn-color);
-            color: var(--btn-text-color);
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            min-width: 80px;
-            cursor: pointer;
+        .status-banner.danger { border: 1px solid var(--neon-red); box-shadow: 0 0 15px rgba(255,0,60,0.3); color: var(--neon-red); }
+        .status-banner.warning { border: 1px solid var(--neon-gold); box-shadow: 0 0 15px rgba(255,215,0,0.3); color: var(--neon-gold); }
+        .status-banner.safe { border: 1px solid var(--neon-blue); box-shadow: 0 0 15px rgba(0,243,255,0.3); color: var(--neon-blue); }
+        .banner-btn { padding: 8px 12px; font-size: 10px; border-radius: 8px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+
+        /* --- SHOP CARDS --- */
+        .list-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .card { background: var(--bg-surface); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+        .card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; } 
+        .card-icon { font-size: 30px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px; flex-shrink: 0; }
+        .card-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .card-info h4 { margin: 0 0 4px 0; font-size: 14px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: space-between; }
+        .card-info p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600; line-height: 1.4; }
+        .card-buy { padding: 10px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; border: none; cursor: pointer; text-transform: uppercase; transition: 0.1s; flex-shrink: 0; }
+        .card-buy:active { transform: scale(0.95); }
+        .card-buy:disabled { background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.2) !important; box-shadow: none !important; border-color: transparent !important; cursor: not-allowed; }
+        
+        .btn-buy-grow { background: rgba(57, 255, 20, 0.1); color: var(--neon-green); border: 1px solid rgba(57, 255, 20, 0.3); }
+        .btn-buy-sell { background: rgba(255, 215, 0, 0.1); color: var(--neon-gold); border: 1px solid rgba(255, 215, 0, 0.3); }
+        .btn-buy-net { background: rgba(0, 243, 255, 0.1); color: var(--neon-blue); border: 1px solid rgba(0, 243, 255, 0.3); }
+
+        #bust-modal .modal-content { border: 2px solid var(--neon-red); box-shadow: 0 0 40px rgba(255,0,60,0.4); }
+        .bust-title { color: var(--neon-red); font-size: 26px; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; text-shadow: 0 0 20px rgba(255,0,60,0.8); text-align: center; }
+
+        /* PARTICLES */
+        .particle { position: fixed; font-weight: 900; font-size: 22px; pointer-events: none; z-index: 100; animation: floatParticle 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; text-shadow: 0 0 10px currentColor; }
+        @keyframes floatParticle { 0% { opacity: 1; transform: translateY(0) scale(0.8); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
+
+        /* TOAST NOTIFICATIONS */
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.95); padding: 12px 20px; border-radius: 12px;
+            font-size: 13px; font-weight: 800; text-align: center; width: 85%; max-width: 350px;
+            z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            animation: slideDownToast 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-        .item-buy:disabled { background-color: #333; color: #666; }
+        @keyframes slideDownToast { 0% { opacity: 0; transform: translate(-50%, -30px); } 100% { opacity: 1; transform: translate(-50%, 0); } }
 
-        /* Stats & Achievements View */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background-color: var(--bg-sec-color); padding: 15px; border-radius: 10px; text-align: center; }
-        .stat-card h5 { margin: 0; color: var(--hint-color); font-size: 12px; }
-        .stat-card p { margin: 5px 0 0 0; color: var(--accent); font-weight: bold; font-size: 16px; }
-        .achievement-list { display: flex; flex-direction: column; gap: 8px; }
-        .achievement { background: #2a382f; padding: 10px; border-radius: 8px; opacity: 0.5; display: flex; align-items: center; }
-        .achievement.unlocked { opacity: 1; border-left: 4px solid var(--accent); background: var(--bg-sec-color); }
-        .ach-icon { font-size: 24px; margin-right: 12px; }
-
-        /* Prestige View */
-        .prestige-box { text-align: center; padding: 20px 0; }
-        .prestige-box h2 { color: #f1c40f; }
-        .prestige-btn { background: #f1c40f; color: #000; font-size: 18px; padding: 15px 30px; border: none; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
-
-        /* Modals */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(3px); }
-        .modal-content { background: var(--bg-sec-color); padding: 25px; border-radius: 16px; width: 90%; max-width: 320px; border: 1px solid #333; }
-        .modal input { width: 100%; padding: 12px; margin: 8px 0 15px; background: var(--bg-color); border: 1px solid #444; border-radius: 8px; color: var(--text-color); font-size: 16px; }
-        .btn-full { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; margin-bottom: 8px; color: var(--btn-text-color); background-color: var(--btn-color); }
-        .btn-danger { background-color: #e74c3c; color: white; }
-        .btn-secondary { background-color: #444; color: white; }
-        .hidden { display: none !important; }
-
-        /* Toast Notifications */
-        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 300; pointer-events: none; }
-        .toast { background-color: var(--accent-dark); color: white; padding: 12px 20px; border-radius: 30px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: slideUp 0.3s ease-out, fadeOut 0.5s ease-in 2.5s forwards; }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        /* MUSIC PLAYER STYLES */
+        .music-player { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+        .music-title { font-size: 11px; color: var(--neon-blue); font-weight: 900; text-transform: uppercase; margin-bottom: 10px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .music-controls { display: flex; justify-content: space-center; align-items: center; gap: 15px; justify-content: center; margin-bottom: 15px; }
+        .music-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .music-btn:active { transform: scale(0.9); }
+        .volume-slider { width: 100%; appearance: none; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; outline: none; }
+        .volume-slider::-webkit-slider-thumb { appearance: none; width: 15px; height: 15px; border-radius: 50%; background: var(--neon-blue); cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Weed Clicker Pro</h1>
-        <button class="admin-btn" onclick="openModal('login-modal')">⚙️ Admin</button>
-    </div>
+    <!-- AUDIO LOOP -->
+    <audio id="bg-music">
+        <source src="" type="audio/mpeg" id="bg-music-src">
+    </audio>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('game')">🌿 Ferme</button>
-        <button class="tab-btn" onclick="switchTab('shop')">🛒 Marché</button>
-        <button class="tab-btn" onclick="switchTab('stats')">📊 Stats</button>
-        <button class="tab-btn" onclick="switchTab('prestige')">✨ Prestige</button>
-    </div>
-
-    <!-- GAME VIEW -->
-    <div id="view-game" class="view active game-view">
-        <div class="counter-box">
-            <p class="counter"><span id="grams-display">0</span> g</p>
-            <div class="sub-counter"><span id="gps-display">0</span> g/s | Clic: <span id="gpc-display">1</span> g</div>
-        </div>
-        <div class="main-button-container" id="main-btn-container">
-            <button class="clicker-btn" id="click-btn">🌿</button>
-        </div>
-    </div>
-
-    <!-- SHOP VIEW -->
-    <div id="view-shop" class="view">
-        <div class="shop-list" id="shop-container">
-            <!-- Injecté via JS -->
-        </div>
-    </div>
-
-    <!-- STATS VIEW -->
-    <div id="view-stats" class="view">
-        <div class="stats-grid">
-            <div class="stat-card"><h5>Total Produit</h5><p id="stat-total">0</p></div>
-            <div class="stat-card"><h5>Clics Totaux</h5><p id="stat-clicks">0</p></div>
-            <div class="stat-card"><h5>Graines Dorées</h5><p id="stat-seeds">0</p></div>
-            <div class="stat-card"><h5>Bonus Prestige</h5><p id="stat-bonus">0%</p></div>
-        </div>
-        <h3 style="margin-top: 10px; font-size: 16px;">🏆 Succès</h3>
-        <div class="achievement-list" id="achievements-container">
-            <!-- Injecté via JS -->
-        </div>
-    </div>
-
-    <!-- PRESTIGE VIEW -->
-    <div id="view-prestige" class="view">
-        <div class="prestige-box">
-            <div style="font-size: 60px; margin-bottom: 10px;">✨</div>
-            <h2>Le Cartel Ultime</h2>
-            <p style="color: var(--hint-color); font-size: 14px; margin-bottom: 20px;">
-                Réinitialisez votre progression actuelle pour gagner des <b>Graines Dorées</b>.<br>
-                Chaque graine augmente votre production globale et vos clics de <b>2%</b>.
-            </p>
-            <div style="background: var(--bg-sec-color); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <p style="margin: 0;">Graines possédées : <b style="color: #f1c40f;" id="prestige-current-seeds">0</b></p>
+    <!-- TOP BAR STATS -->
+    <div class="top-bar">
+        <div class="header-title">
+            <h1 style="display:flex; align-items:baseline; gap:8px;">
+                LE CARTEL 
+                <span style="font-size:11px; font-weight:700; color:var(--text-muted); font-style:normal; letter-spacing:0; text-shadow:none;">by TGV</span>
+                <span class="vip-badge-header" id="header-vip-tag">VIP</span>
+            </h1>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <div class="admin-icon" onclick="openModal('player-settings-modal')">⚙️</div>
             </div>
-            <p>Graines à gagner si vous réinitialisez maintenant :</p>
-            <h3 style="color: #2ecc71; font-size: 30px; margin: 10px 0;" id="prestige-gain">+0</h3>
-            <button class="prestige-btn" id="btn-prestige" onclick="doPrestige()">Prestige !</button>
+        </div>
+        <div class="stats-row">
+            <div class="stat-badge">
+                <span>Matos</span>
+                <strong class="val-weed" id="ui-weed">0 g</strong>
+            </div>
+            <div class="stat-badge">
+                <span>Biff</span>
+                <strong class="val-cash" id="ui-cash">0 $</strong>
+            </div>
+            <div class="stat-badge">
+                <span>Police</span>
+                <strong class="val-heat" id="ui-heat">0%</strong>
+            </div>
+            <div class="stat-badge" style="display:none;" id="rep-badge">
+                <span>Respect</span>
+                <strong class="val-rep" id="ui-rep">0 👑</strong>
+            </div>
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
-    <div id="toast-container"></div>
+    <!-- MAIN VIEWS -->
+    <div class="main-container">
+        
+        <!-- STATUS BANNERS -->
+        <div id="banner-debt" class="status-banner warning">
+            <div>💸 DETTE: <span id="banner-debt-amount" style="color:#fff;">0</span>$ - <span id="banner-debt-timer">00:00</span></div>
+            <button class="banner-btn" style="background:var(--neon-gold); color:black;" onclick="payDebt()">Payer</button>
+        </div>
+        <div id="banner-gang" class="status-banner danger">
+            <div>🥷 GANG AUX TROUSSES - <span id="banner-gang-timer">00:00</span></div>
+            <button class="banner-btn" style="background:var(--neon-red); color:white;" onclick="switchTab('network', document.getElementById('tab-network-btn'))">Recruter</button>
+        </div>
+        <div id="banner-vigile" class="status-banner safe">
+            <div>🛡️ VIGILE ACTIF (0 Police) - <span id="banner-vigile-timer">00:00</span></div>
+        </div>
 
-    <!-- MODAL CONNEXION -->
-    <div id="login-modal" class="modal hidden">
+        <!-- 1. LABO (CULTIVER) -->
+        <div id="view-lab" class="view active">
+            <div class="clicker-zone">
+                <h3 style="margin:0 0 15px 0; font-size:18px; font-weight:900; letter-spacing:1px;">L'Atelier (Prod)</h3>
+                <button class="clicker-btn" id="btn-grow">🌿</button>
+                <br>
+                <div class="rate-display" style="border-color: var(--neon-green);">Production : +<span id="ui-gps" style="color:var(--neon-green)">0</span> g/s</div>
+            </div>
+            <h2 class="section-title">Matériel de Culture</h2>
+            <div class="list-container" id="grow-shop"></div>
+        </div>
+
+        <!-- 2. RUE (VENDRE) -->
+        <div id="view-street" class="view">
+            <div class="clicker-zone">
+                <h3 style="margin:0 0 15px 0; font-size:18px; font-weight:900; letter-spacing:1px;">Le Terrain (Vente)</h3>
+                <button class="clicker-btn" id="btn-sell">🤝</button>
+                <br>
+                <div class="rate-display" style="border-color: var(--neon-gold);">Écoulement : -<span id="ui-sps" style="color:var(--neon-gold)">0</span> g/s</div>
+                <div style="margin-top:10px; font-size:11px; color:var(--text-muted); font-weight:700;">Prix rue: <span id="ui-price" style="color:var(--neon-gold)">3.5</span>$/g</div>
+            </div>
+            <h2 class="section-title">Réseau & Compétences</h2>
+            <div class="list-container" id="sell-shop"></div>
+        </div>
+
+        <!-- 3. TÉLÉPHONE (MESSAGES/EVENTS) -->
+        <div id="view-phone" class="view">
+            <div id="phone-list-view" style="display:flex; flex-direction:column; height:100%;">
+                <div class="phone-header">
+                    <span style="color:var(--neon-blue);">📱 Messagerie Cryptée</span>
+                    <span style="font-size: 10px; color:var(--text-muted); font-weight:bold;">VPN ACTIF</span>
+                </div>
+                <div id="empty-messages" style="text-align:center; padding: 50px 20px; color: var(--text-muted); font-size: 15px; font-weight:700;">
+                    📵 Aucune notification.<br><span style="font-size:12px; font-weight:500;">Attire l'attention (Respect) pour recevoir des messages.</span>
+                </div>
+                <div class="chat-list-view" id="messages-container"></div>
+            </div>
+            
+            <div id="phone-detail-view" class="chat-detail-view">
+                <div class="chat-detail-header">
+                    <button class="btn-back" onclick="closeChat()">❮</button>
+                    <div class="chat-preview-icon" id="detail-icon" style="width:35px; height:35px; font-size:18px;">👤</div>
+                    <div style="font-weight:900; font-size:14px; text-transform:uppercase;" id="detail-name">Contact</div>
+                </div>
+                <div class="chat-thread-container" id="detail-thread"></div>
+                <div class="chat-actions-container" id="detail-actions"></div>
+            </div>
+        </div>
+
+        <!-- 4. RÉSEAU (CONTACTS RPG & EMPLOYÉS) -->
+        <div id="view-network" class="view">
+            <div style="background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.2); padding: 15px; border-radius: 15px; margin-bottom: 25px; font-size: 12px; line-height: 1.5; font-weight:600;">
+                👑 <b>LE CARTEL</b> : Recrute des experts et assure ta sécurité. Améliore-les avec ton Respect.
+            </div>
+            
+            <h2 class="section-title">Sécurité & Employés</h2>
+            <div class="list-container">
+                <div class="card" style="border-left-color: var(--neon-blue);">
+                    <div class="card-icon" style="color:var(--neon-blue); box-shadow: inset 0 0 10px rgba(0,243,255,0.2);">🛡️</div>
+                    <div class="card-info">
+                        <h4>Vigile <span style="color:var(--neon-blue); font-size:10px; font-weight:900;">(15 mins)</span></h4>
+                        <p style="color:var(--text-muted)">Annule un gang et bloque la Police pendant 15 minutes.</p>
+                    </div>
+                    <button class="card-buy btn-buy-net" id="btn-buy-vigile" onclick="buyVigile()">2000 $</button>
+                </div>
+            </div>
+
+            <div style="background: rgba(255, 0, 60, 0.05); border: 1px solid rgba(255, 0, 60, 0.2); padding: 15px; border-radius: 15px; margin-bottom: 25px;">
+                <h4 style="margin:0 0 10px 0; color:var(--neon-red); font-size:14px; display:flex; align-items:center; gap:5px;">🚓 Corruption (Baisser la Police)</h4>
+                <button class="btn-full" style="background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); margin:0;" onclick="bribePolice()">Graisser la patte (Coût : <span id="bribe-cost">500</span> $)</button>
+            </div>
+
+            <h2 class="section-title">VIP & Spécialistes</h2>
+            <div class="list-container" id="network-shop"></div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('lab', this)">
+            <span class="tab-icon">🧪</span>Labo
+        </button>
+        <button class="tab-btn" onclick="switchTab('street', this)">
+            <span class="tab-icon">💸</span>La Rue
+        </button>
+        <button class="tab-btn" onclick="switchTab('phone', this)">
+            <span class="tab-icon">📱</span>Messages
+            <div class="notif-dot" id="notif-phone"></div>
+        </button>
+        <button class="tab-btn" id="tab-network-btn" onclick="switchTab('network', this)">
+            <span class="tab-icon">👥</span>Cartel
+        </button>
+    </div>
+
+    <!-- BUST MODAL -->
+    <div id="bust-modal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0;">Accès Admin</h3>
-            <p id="error-msg" style="color: #e74c3c; font-size: 13px; display: none;">Identifiants incorrects</p>
+            <div class="bust-title">🚨 PERQUISITION 🚨</div>
+            <div id="bust-desc" style="font-size: 14px; margin-bottom: 20px; line-height: 1.5; color: white; font-weight: 600;"></div>
+            
+            <button class="btn-full bg-green" onclick="acceptDebtChoice()">Accepter (30m pour payer)</button>
+            <button class="btn-full bg-red" onclick="refuseDebtChoice()">Refuser (Guerre de Gangs)</button>
+        </div>
+    </div>
+
+    <!-- PLAYER SETTINGS MODAL -->
+    <div id="player-settings-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: white; margin-bottom: 20px;">Paramètres</h3>
+            
+            <div class="music-player">
+                <div class="music-title" id="music-track-name">Radio Éteinte</div>
+                <div class="music-controls">
+                    <button class="music-btn" onclick="changeTrack(-1)">⏮</button>
+                    <button class="music-btn" id="btn-play-music" onclick="toggleMusic()">▶️</button>
+                    <button class="music-btn" onclick="changeTrack(1)">⏭</button>
+                </div>
+                <label style="font-size:10px; color:var(--text-muted); margin-bottom:5px; display:block;">VOLUME</label>
+                <input type="range" class="volume-slider" id="music-volume" min="0" max="100" value="30" oninput="updateVolume()">
+            </div>
+
+            <button class="btn-full" style="background: linear-gradient(90deg, #ffd700, #ff8c00); color: black;" onclick="buyVIP()">
+                👑 Devenir VIP (Paypal)
+            </button>
+            <p style="font-size: 10px; color: var(--text-muted); text-align: center; margin-top: -5px; margin-bottom: 20px;">
+                Le VIP offre x1.35 Cash (5m) et 10m d'invincibilité chaque jour à 18h00.
+            </p>
+
+            <button class="btn-full bg-red" onclick="playerWipeGame()">Effacer ma sauvegarde</button>
+            
+            <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <button class="btn-full bg-gray" style="font-size: 11px; padding: 10px;" onclick="openAdminLogin()">🔒 Accès Admin</button>
+            <button class="btn-full bg-gray" onclick="closeModal('player-settings-modal')">Fermer</button>
+        </div>
+    </div>
+
+    <!-- MODALS ADMIN -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h3>Porte Dérobée</h3>
+            <p id="error-msg" style="color: var(--neon-red); font-size: 13px; font-weight:700; display: none;">Accès refusé.</p>
             <input type="text" id="admin-id" placeholder="Identifiant" autocapitalize="none">
             <input type="password" id="admin-pass" placeholder="Mot de passe">
-            <button class="btn-full" onclick="verifyAdmin()">Connexion</button>
-            <button class="btn-full btn-secondary" onclick="closeModal('login-modal')">Annuler</button>
+            <button class="btn-full bg-green" onclick="verifyAdmin()">Entrer</button>
+            <button class="btn-full bg-gray" onclick="closeModal('login-modal')">Esquiver</button>
         </div>
     </div>
 
-    <!-- MODAL REGLAGES ADMIN -->
-    <div id="settings-modal" class="modal hidden">
+    <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0;">Configuration Admin</h3>
-            <input type="number" id="add-grams-input" placeholder="Ajouter des grammes (ex: 1000000)">
-            <button class="btn-full" onclick="adminAddGrams()">Valider l'ajout</button>
-            <input type="number" id="add-seeds-input" placeholder="Ajouter Graines Dorées">
-            <button class="btn-full" onclick="adminAddSeeds()" style="background: #f1c40f; color: #000;">Ajouter Graines</button>
-            <hr style="border: 0.5px solid #444; margin: 20px 0;">
-            <button class="btn-full btn-danger" onclick="adminWipeGame()">Effacer la sauvegarde complète</button>
-            <button class="btn-full btn-secondary" style="margin-top: 10px;" onclick="closeModal('settings-modal')">Fermer</button>
+            <h3 style="color: var(--neon-green);">God Mode</h3>
+            
+            <label style="font-size: 11px; font-weight:800; color: var(--text-muted); letter-spacing:1px;">INJECTER CASH ($)</label>
+            <input type="number" id="add-cash-input" placeholder="Montant...">
+            <button class="btn-full" style="background:var(--neon-gold); color:black;" onclick="adminAddCash()">+ Ajouter Cash</button>
+            
+            <label style="font-size: 11px; font-weight:800; color: var(--text-muted); margin-top:15px; display:block; letter-spacing:1px;">INJECTER RESPECT (👑)</label>
+            <input type="number" id="add-rep-input" placeholder="Montant...">
+            <button class="btn-full" style="background:var(--neon-blue); color:black;" onclick="adminAddRep()">+ Ajouter Respect</button>
+
+            <label style="font-size: 11px; font-weight:800; color: var(--text-muted); margin-top:15px; display:block; letter-spacing:1px;">GÉNÉRER UN MESSAGE</label>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:8px;">
+                <button class="btn-full bg-gray" style="margin:0; font-size:10px; padding:12px;" onclick="adminForceEvent('e1')">🏃‍♂️ Client Pressé</button>
+                <button class="btn-full bg-gray" style="margin:0; font-size:10px; padding:12px;" onclick="adminForceEvent('e3')">🚓 Flic Corrompu</button>
+                <button class="btn-full bg-gray" style="margin:0; font-size:10px; padding:12px;" onclick="adminForceEvent('e7')">🐀 Piège (Indic)</button>
+                <button class="btn-full bg-gray" style="margin:0; font-size:10px; padding:12px;" onclick="adminForceEvent('e5')">🥷 Gang Rival</button>
+            </div>
+
+            <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin: 25px 0;">
+            <button class="btn-full bg-purple" id="btn-autoclick" onclick="toggleAdminAutoClick()">⚡ Auto-Clicker Extreme ⚡</button>
+            <button class="btn-full bg-gray" style="margin-top:10px;" onclick="closeModal('settings-modal')">Fermer</button>
         </div>
+    </div>
+
+    <!-- WANTED SCREEN -->
+    <div id="wanted-overlay">
+        <div class="wanted-text">WANTED</div>
+        <div class="wanted-sub" id="wanted-reason">LA BAC A FRAPPÉ</div>
     </div>
 
     <script>
-        // Init Telegram
-        if (window.Telegram && window.Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-        }
+        if (window.Telegram && window.Telegram.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); Telegram.WebApp.setHeaderColor('#0a0a0c'); }
 
-        // Base de données objets
-        const SHOP_ITEMS = [
-            { id: 'pot', name: 'Pot en terre', baseCost: 15, gps: 0.5, icon: '🪴' },
-            { id: 'led', name: 'Lampe LED', baseCost: 100, gps: 4, icon: '💡' },
-            { id: 'hydro', name: 'Système Hydro', baseCost: 1100, gps: 32, icon: '💧' },
-            { id: 'serre', name: 'Serre Pro', baseCost: 12000, gps: 260, icon: '⛺' },
-            { id: 'disp', name: 'Dispensaire', baseCost: 130000, gps: 1400, icon: '🏥' },
-            { id: 'cartel', name: 'Cartel', baseCost: 1500000, gps: 7800, icon: '🏢' },
-            { id: 'ile', name: 'Île Privée', baseCost: 20000000, gps: 44000, icon: '🏝️' }
+        // --- DATABASE ---
+        const GROW_ITEMS = [
+            { id: 'pot', name: 'Pot sur Balcon', cost: 150, rate: 0.2, icon: '🪴', desc: '+0.2 g/s', maxLevel: 100 },
+            { id: 'lampe', name: 'Lampe Eco', cost: 1200, rate: 1.5, icon: '💡', desc: '+1.5 g/s', maxLevel: 50 },
+            { id: 'hydro', name: 'Système Hydro', cost: 8500, rate: 8, icon: '💧', desc: '+8 g/s', maxLevel: 50 },
+            { id: 'serre', name: 'Serre Clandestine', cost: 45000, rate: 45, icon: '⛺', desc: '+45 g/s', maxLevel: 25 }
         ];
 
-        const ACHIEVEMENTS = [
-            { id: 'a1', name: 'Première Feuille', desc: 'Produire 100g au total', req: 100, type: 'total', icon: '🌱' },
-            { id: 'a2', name: 'Petit Dealer', desc: 'Produire 10,000g au total', req: 10000, type: 'total', icon: '🚲' },
-            { id: 'a3', name: 'Baron Local', desc: 'Produire 1,000,000g au total', req: 1000000, type: 'total', icon: '👑' },
-            { id: 'a4', name: 'Clic Frénétique', desc: 'Cliquer 1000 fois', req: 1000, type: 'clicks', icon: '🖱️' },
-            { id: 'a5', name: 'Usine', desc: 'Atteindre 1,000 g/s', req: 1000, type: 'gps', icon: '🏭' },
-            { id: 'a6', name: 'Illuminati', desc: 'Obtenir 1 Graine Dorée', req: 1, type: 'seeds', icon: '✨' }
+        const SELL_ITEMS = [
+            { id: 'pochon', name: 'Pochons Ziploc', cost: 250, rate: 1, type: 'click', icon: '🛍️', desc: 'Manuel : +1g/clic', maxLevel: 50 },
+            { id: 'balance', name: 'Balance Précise', cost: 3500, rate: 3, type: 'click', icon: '⚖️', desc: 'Manuel : +3g/clic', maxLevel: 50 },
+            { id: 'tel', name: 'Tel Crypté', cost: 12000, rate: 8, type: 'click', icon: '📱', desc: 'Manuel : +8g/clic', maxLevel: 25 },
+            
+            { id: 'guetteur', name: 'Gamin du bloc', cost: 800, rate: 0.2, type: 'auto', icon: '👀', desc: 'Auto : 0.2 g/s', maxLevel: 100 },
+            { id: 'dealer', name: 'Dealer Régulier', cost: 4500, rate: 1.2, type: 'auto', icon: '🚲', desc: 'Auto : 1.2 g/s', maxLevel: 50 },
+            { id: 'four', name: 'Point de Deal', cost: 25000, rate: 6, type: 'auto', icon: '🔥', desc: 'Auto : 6 g/s', maxLevel: 25 }
         ];
 
-        // État par défaut du jeu
-        let defaultGame = {
-            grams: 0,
-            totalGramsEver: 0,
-            totalClicks: 0,
-            goldenSeeds: 0,
-            buildings: {}, // { id: count }
-            unlockedAchievements: []
-        };
+        const NETWORK_ITEMS = [
+            { id: 'chimiste', name: 'El Chemisto', baseCostRep: 10, bonusType: 'grow', icon: '👨‍🔬', desc: 'Prod. +50% / lvl', maxLevel: 10 },
+            { id: 'comptable', name: 'Le Blanchisseur', baseCostRep: 15, bonusType: 'heat', icon: '📊', desc: 'Police ralentie de 20% / lvl', maxLevel: 10 },
+            { id: 'avocat', name: 'Saul', baseCostRep: 30, bonusType: 'price', icon: '💼', desc: 'Prix +30% / lvl', maxLevel: 10 },
+            { id: 'corrompu', name: 'Inspecteur B.', baseCostRep: 50, bonusType: 'bribe', icon: '🕵️', desc: 'Pot-de-vin -30% / lvl', maxLevel: 5 },
+            { id: 'parrain', name: 'El Patron', baseCostRep: 150, bonusType: 'grow', icon: '🕴️', desc: 'Prod. +100% / lvl', maxLevel: 5 },
+            { id: 'cartel', name: 'Contact Cartel', baseCostRep: 400, bonusType: 'price', icon: '✈️', desc: 'Prix +100% / lvl', maxLevel: 5 }
+        ];
 
-        let game = JSON.parse(JSON.stringify(defaultGame));
-        let currentGps = 0;
-        let currentGpc = 1; // Grams per click
-        let prestigeGainCache = 0;
+        const EVENT_TEMPLATES = [
+            { id: 'e1', sender: '🏃‍♂️ Client Pressé', initText: "Gros, il me faut 15g en urgence pour une soirée. Je te file 100$ direct.", reqWeed: 15, reqCash: 0, rewardCash: 100, rewardRep: 1 },
+            { id: 'e2', sender: '🤝 Grossiste', initText: "J'ai besoin de 100g pour ravitailler ma zone. Paiement de 500$.", reqWeed: 100, reqCash: 0, rewardCash: 500, rewardRep: 3 },
+            { id: 'e3', sender: '🚓 Flic Corrompu', initText: "Descente imminente. Donne moi 1500$ et on vous oublie. Sinon je saisis.", reqWeed: 0, reqCash: 1500, rewardCash: 0, rewardRep: 0, isCop: true },
+            { id: 'e4', sender: '🕵️ L\'informateur', initText: "File moi 50g, j'ai des infos pour te faire monter dans l'estime des boss.", reqWeed: 50, reqCash: 0, rewardCash: 0, rewardRep: 5 },
+            { id: 'e5', sender: '🥷 MS-13', initText: "Paye la taxe (800$) ou mes gars viennent vider tes stocks.", reqWeed: 0, reqCash: 800, rewardCash: 0, rewardRep: 0, isGang: true },
+            { id: 'e6', sender: '💊 Tox', initText: "Dépanne moi 5g stp, je dirai que t'es un bon !", reqWeed: 5, reqCash: 0, rewardCash: 0, rewardRep: 1 },
+            { id: 'e7', sender: '🐀 Vieux Pote', initText: "Eh mon reuf, y'a un gros coup à faire... 👮‍♂️ Ramène 20g, le mec paye 2000$.", reqWeed: 20, reqCash: 0, rewardCash: 0, rewardRep: 0, isTrap: true }
+        ];
 
-        // Formateur de nombres (1.2k, 1.5M, etc.)
-        function formatNumber(num) {
-            if (num < 1000) return Math.floor(num);
-            const suffixes = ["", "k", "M", "B", "T", "Qa"];
-            const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
-            let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
-            if (shortValue % 1 != 0) shortValue = shortValue.toFixed(1);
-            return shortValue + suffixes[suffixNum];
+        const MUSIC_TRACKS = [
+            { name: "🎶 Jul Style - Instru", url: "https://cdn.pixabay.com/audio/2022/12/28/audio_6b5c03c518.mp3" },
+            { name: "🎶 Rap FR Sombre", url: "https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" },
+            { name: "🎶 Hugo TSR Vibe", url: "https://cdn.pixabay.com/audio/2022/10/18/audio_31c2730e64.mp3" },
+            { name: "🎶 Guizmo Type Beat", url: "https://cdn.pixabay.com/audio/2023/02/28/audio_55d4918e3d.mp3" }
+        ];
+
+        // --- STATE ---
+        let game = { weed: 0, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, lastGangTime: 0, isVIP: false, lastVIPReward: "" };
+        let currentGps = 0; let currentSps = 0; let currentPrice = 3.5; let clickGpc = 1; let clickSpc = 1;
+        let adminAutoClickerOn = false;
+        let gangBonusDeadline = 0; 
+        let vipBonusDeadline = 0;
+
+        let currentTrackIdx = 0;
+        let isMusicPlaying = false;
+
+        // Init Inventory
+        [...GROW_ITEMS, ...SELL_ITEMS, ...NETWORK_ITEMS].forEach(i => { if (game.inventory[i.id] === undefined) game.inventory[i.id] = 0; });
+
+        // --- FORMAT ---
+        function formatVal(n) {
+            if (n < 1000) return Math.floor(n);
+            if (n < 1000000) return (n/1000).toFixed(1) + 'k';
+            return (n/1000000).toFixed(2) + 'M';
         }
 
-        // Chargement Sauvegarde
-        function loadGame() {
-            const saved = localStorage.getItem('weed_clicker_pro_save');
-            if (saved) {
-                try { 
-                    let parsed = JSON.parse(saved); 
-                    game = { ...defaultGame, ...parsed }; // Fusion sécurisée
-                } catch (e) { console.error("Erreur de sauvegarde"); }
+        // --- ENGINE ---
+        function showToast(text, colorHex) {
+            const t = document.createElement('div');
+            t.className = 'toast'; t.innerText = text;
+            t.style.border = `1px solid ${colorHex}`; t.style.color = colorHex;
+            t.style.boxShadow = `0 0 15px ${colorHex}40`;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transition = '0.3s'; setTimeout(()=>t.remove(), 300); }, 3500);
+        }
+
+        function loadSave() {
+            const save = localStorage.getItem('cartel_tycoon_save');
+            if (save) { 
+                let parsed = JSON.parse(save);
+                game = { ...game, ...parsed }; 
+                if(game.heat === undefined) game.heat = 0;
+                if(game.sellTransactionCount === undefined) game.sellTransactionCount = 0;
+                if(game.vigileDeadline === undefined) game.vigileDeadline = 0;
+                if(game.gangTrackerDeadline === undefined) game.gangTrackerDeadline = 0;
+                if(game.pendingDebt === undefined) game.pendingDebt = 0;
+                if(game.lastThreatTime === undefined) game.lastThreatTime = 0;
+                if(game.lastTrapTime === undefined) game.lastTrapTime = 0;
+                if(game.lastGangTime === undefined) game.lastGangTime = 0;
+                if(game.isVIP === undefined) game.isVIP = false;
+                if(game.lastVIPReward === undefined) game.lastVIPReward = "";
+                
+                game.activeEvents.forEach(ev => {
+                    if(!ev.history) { ev.history = [{ sender: 'them', text: ev.initText || ev.text }]; }
+                });
             }
-            SHOP_ITEMS.forEach(item => { if (!game.buildings[item.id]) game.buildings[item.id] = 0; });
         }
+        function saveGame() { localStorage.setItem('cartel_tycoon_save', JSON.stringify(game)); }
+        function getCost(baseCost, count) { return Math.floor(baseCost * Math.pow(1.35, count)); } 
+        function getRepCost(baseCost, count) { return Math.floor(baseCost * Math.pow(1.5, count)); } 
 
-        function saveGame() {
-            localStorage.setItem('weed_clicker_pro_save', JSON.stringify(game));
-        }
-
-        // Calculs (GpS, Clics, Prix)
-        function getCost(itemId) {
-            const item = SHOP_ITEMS.find(i => i.id === itemId);
-            const count = game.buildings[itemId] || 0;
-            return Math.floor(item.baseCost * Math.pow(1.15, count));
-        }
-
-        function calculateStats() {
+        function calcStats() {
+            // Grow
             let baseGps = 0;
-            SHOP_ITEMS.forEach(item => { baseGps += (game.buildings[item.id] || 0) * item.gps; });
+            GROW_ITEMS.forEach(i => baseGps += game.inventory[i.id] * i.rate);
             
-            const multiplier = 1 + (game.goldenSeeds * 0.02); // 2% par graine
-            currentGps = baseGps * multiplier;
+            let growMult = 1;
+            if (game.inventory['chimiste']) growMult += (0.5 * game.inventory['chimiste']);
+            if (game.inventory['parrain']) growMult += (1.0 * game.inventory['parrain']);
             
-            // Le clic donne 1 de base + 1% du Gps par clic, le tout multiplié
-            let baseClick = 1 + (baseGps * 0.01);
-            currentGpc = baseClick * multiplier;
+            currentGps = baseGps * growMult;
+            clickGpc = (1 + (baseGps * 0.02)) * growMult; 
 
-            // Calcul prestige
-            // Formule: racine cubique de (totalGrams / 1 million)
-            let calculatedSeeds = Math.floor(Math.cbrt(game.totalGramsEver / 1000000));
-            prestigeGainCache = Math.max(0, calculatedSeeds - game.goldenSeeds);
+            // Sell (Auto & Click)
+            let baseSps = 0; clickSpc = 1;
+            SELL_ITEMS.forEach(i => {
+                if(i.type === 'auto') baseSps += game.inventory[i.id] * i.rate;
+                if(i.type === 'click') clickSpc += game.inventory[i.id] * i.rate;
+            });
+            currentSps = baseSps;
+
+            // Price
+            let priceMult = 1;
+            if (game.inventory['avocat']) priceMult += (0.3 * game.inventory['avocat']);
+            if (game.inventory['cartel']) priceMult += (1.0 * game.inventory['cartel']);
+            
+            if (gangBonusDeadline > Date.now()) {
+                priceMult *= 2.0; 
+                document.getElementById('ui-price').style.color = "var(--neon-green)";
+                document.getElementById('ui-price').style.textShadow = "0 0 10px var(--neon-green)";
+            } else if (vipBonusDeadline > Date.now()) {
+                priceMult *= 1.35; 
+                document.getElementById('ui-price').style.color = "#ffd700";
+                document.getElementById('ui-price').style.textShadow = "0 0 10px rgba(255, 215, 0, 0.5)";
+            } else {
+                document.getElementById('ui-price').style.color = "var(--neon-gold)";
+                document.getElementById('ui-price').style.textShadow = "none";
+            }
+            
+            currentPrice = 3.5 * priceMult;
+            document.getElementById('ui-price').innerText = currentPrice.toFixed(1);
         }
 
-        // Interface Utilisateur
+        function getBribeCost() {
+            let cost = Math.floor(100 + (game.cash * 0.1) + (game.heat * 10)); 
+            if(game.inventory['corrompu']) cost = Math.floor(cost * Math.pow(0.7, game.inventory['corrompu']));
+            return cost;
+        }
+
         function updateUI() {
-            // Topbar
-            document.getElementById('grams-display').innerText = formatNumber(game.grams);
-            document.getElementById('gps-display').innerText = formatNumber(currentGps);
-            document.getElementById('gpc-display').innerText = formatNumber(currentGpc);
-
-            // Boutique
-            SHOP_ITEMS.forEach(item => {
-                const btn = document.getElementById(`buy-${item.id}`);
-                const cost = getCost(item.id);
-                if (btn) {
-                    btn.innerText = formatNumber(cost) + ' g';
-                    btn.disabled = game.grams < cost;
-                    document.getElementById(`count-${item.id}`).innerText = game.buildings[item.id];
-                }
-            });
-
-            // Stats
-            document.getElementById('stat-total').innerText = formatNumber(game.totalGramsEver);
-            document.getElementById('stat-clicks').innerText = formatNumber(game.totalClicks);
-            document.getElementById('stat-seeds').innerText = formatNumber(game.goldenSeeds);
-            document.getElementById('stat-bonus').innerText = (game.goldenSeeds * 2) + '%';
-
-            // Prestige
-            document.getElementById('prestige-current-seeds').innerText = formatNumber(game.goldenSeeds);
-            document.getElementById('prestige-gain').innerText = '+' + formatNumber(prestigeGainCache);
-            document.getElementById('btn-prestige').disabled = prestigeGainCache <= 0;
-        }
-
-        function buildShop() {
-            const container = document.getElementById('shop-container');
-            container.innerHTML = '';
-            SHOP_ITEMS.forEach(item => {
-                container.innerHTML += `
-                    <div class="shop-item">
-                        <div class="item-icon">${item.icon}</div>
-                        <div class="item-info">
-                            <h4>${item.name}</h4>
-                            <p>+${formatNumber(item.gps)} g/s | Possédés: <span id="count-${item.id}">0</span></p>
-                        </div>
-                        <button class="item-buy" id="buy-${item.id}" onclick="buyItem('${item.id}')">Calcul...</button>
-                    </div>
-                `;
-            });
-        }
-
-        function buildAchievements() {
-            const container = document.getElementById('achievements-container');
-            container.innerHTML = '';
-            ACHIEVEMENTS.forEach(ach => {
-                const unlocked = game.unlockedAchievements.includes(ach.id);
-                container.innerHTML += `
-                    <div class="achievement ${unlocked ? 'unlocked' : ''}" id="ach-${ach.id}">
-                        <div class="ach-icon">${unlocked ? ach.icon : '🔒'}</div>
-                        <div class="item-info">
-                            <h4>${ach.name}</h4>
-                            <p>${ach.desc}</p>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // Actions Jeu
-        function spawnParticle(x, y, text) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            particle.innerText = text;
-            particle.style.left = `${x - 20}px`;
-            particle.style.top = `${y - 20}px`;
-            document.body.appendChild(particle);
-            setTimeout(() => particle.remove(), 1000);
-        }
-
-        document.getElementById('click-btn').addEventListener('pointerdown', (e) => {
-            game.grams += currentGpc;
-            game.totalGramsEver += currentGpc;
-            game.totalClicks++;
+            document.getElementById('ui-weed').innerText = formatVal(game.weed) + ' g';
+            document.getElementById('ui-cash').innerText = formatVal(game.cash) + ' $';
+            document.getElementById('ui-rep').innerText = formatVal(game.rep) + ' 👑';
             
-            // Particules
-            let touchX = e.clientX || window.innerWidth / 2;
-            let touchY = e.clientY || window.innerHeight / 3;
-            spawnParticle(touchX, touchY, '+' + formatNumber(currentGpc));
+            document.getElementById('header-vip-tag').style.display = game.isVIP ? 'inline-block' : 'none';
+
+            document.getElementById('ui-heat').innerText = Math.floor(game.heat) + '%';
+            if (game.heat > 80) document.getElementById('ui-heat').style.color = "var(--neon-red)";
+            else if (game.heat > 50) document.getElementById('ui-heat').style.color = "var(--neon-gold)";
+            else document.getElementById('ui-heat').style.color = "white";
+
+            if (game.rep > 0 || game.inventory['chimiste']) document.getElementById('rep-badge').style.display = "flex";
             
-            calculateStats();
-            updateUI();
-            checkAchievements();
-        });
-
-        function buyItem(id) {
-            const cost = getCost(id);
-            if (game.grams >= cost) {
-                game.grams -= cost;
-                game.buildings[id]++;
-                calculateStats();
-                updateUI();
-                saveGame();
-                checkAchievements();
-            }
-        }
-
-        function doPrestige() {
-            if (prestigeGainCache > 0) {
-                if(confirm(`Voulez-vous réinitialiser vos bâtiments et vos grammes pour gagner ${prestigeGainCache} Graines Dorées ?`)) {
-                    game.goldenSeeds += prestigeGainCache;
-                    game.grams = 0;
-                    game.buildings = {};
-                    SHOP_ITEMS.forEach(item => { game.buildings[item.id] = 0; });
-                    calculateStats();
-                    updateUI();
-                    saveGame();
-                    switchTab('game');
-                    showToast('🌟 Prestige effectué !');
-                }
-            }
-        }
-
-        // Succès et Notifications
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerText = msg;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function checkAchievements() {
-            ACHIEVEMENTS.forEach(ach => {
-                if (!game.unlockedAchievements.includes(ach.id)) {
-                    let achieved = false;
-                    if (ach.type === 'total' && game.totalGramsEver >= ach.req) achieved = true;
-                    if (ach.type === 'clicks' && game.totalClicks >= ach.req) achieved = true;
-                    if (ach.type === 'gps' && currentGps >= ach.req) achieved = true;
-                    if (ach.type === 'seeds' && game.goldenSeeds >= ach.req) achieved = true;
-
-                    if (achieved) {
-                        game.unlockedAchievements.push(ach.id);
-                        showToast(`🏆 Succès débloqué : ${ach.name}`);
-                        buildAchievements(); // Refresh UI
+            document.getElementById('ui-gps').innerText = formatVal(currentGps);
+            document.getElementById('ui-sps').innerText = formatVal(currentSps);
+            
+            GROW_ITEMS.forEach(i => {
+                const btn = document.getElementById(`buy-${i.id}`);
+                if(btn) { 
+                    if(game.inventory[i.id] >= i.maxLevel) {
+                        btn.disabled = true; btn.innerText = 'MAX'; btn.style.background = 'rgba(255,255,255,0.05)';
+                    } else {
+                        btn.disabled = game.cash < getCost(i.cost, game.inventory[i.id]); btn.innerText = formatVal(getCost(i.cost, game.inventory[i.id])) + ' $'; 
                     }
                 }
+                const c = document.getElementById(`count-${i.id}`); if(c) c.innerText = game.inventory[i.id] + '/' + i.maxLevel;
             });
+            SELL_ITEMS.forEach(i => {
+                const btn = document.getElementById(`buy-${i.id}`);
+                if(btn) { 
+                    if(game.inventory[i.id] >= i.maxLevel) {
+                        btn.disabled = true; btn.innerText = 'MAX'; btn.style.background = 'rgba(255,255,255,0.05)';
+                    } else {
+                        btn.disabled = game.cash < getCost(i.cost, game.inventory[i.id]); btn.innerText = formatVal(getCost(i.cost, game.inventory[i.id])) + ' $'; 
+                    }
+                }
+                const c = document.getElementById(`count-${i.id}`); if(c) c.innerText = game.inventory[i.id] + '/' + i.maxLevel;
+            });
+            NETWORK_ITEMS.forEach(i => {
+                const btn = document.getElementById(`buy-${i.id}`);
+                if(btn) { 
+                    if(game.inventory[i.id] >= i.maxLevel) {
+                        btn.disabled = true; btn.innerText = 'MAX'; btn.style.background = 'rgba(255,255,255,0.05)';
+                    } else {
+                        let cost = getRepCost(i.baseCostRep, game.inventory[i.id]);
+                        btn.disabled = game.rep < cost; 
+                        btn.innerText = cost + ' 👑'; 
+                    }
+                }
+                const c = document.getElementById(`count-${i.id}`); if(c) c.innerText = game.inventory[i.id] + '/' + i.maxLevel;
+            });
+
+            document.getElementById('bribe-cost').innerText = formatVal(getBribeCost());
+            document.getElementById('btn-buy-vigile').disabled = game.cash < 2000;
         }
 
-        // Navigation Onglets
-        function switchTab(tabId) {
-            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(`view-${tabId}`).classList.add('active');
-            event.currentTarget.classList.add('active');
+        // --- RENDER LISTS ---
+        function renderShops() {
+            const createCard = (i, type, colorHex, btnClass, onclickStr, costTxt) => `
+                <div class="card" style="border-left-color: ${colorHex};">
+                    <div class="card-icon" style="color:${colorHex}; box-shadow: inset 0 0 10px ${colorHex}40;">${i.icon}</div>
+                    <div class="card-info">
+                        <h4>${i.name} <span style="color:${colorHex}; font-size:11px; font-weight:900;">lvl <span id="count-${i.id}">0/${i.maxLevel}</span></span></h4>
+                        <p>${i.desc}</p>
+                    </div>
+                    <button class="card-buy ${btnClass}" id="buy-${i.id}" onclick="${onclickStr}">${costTxt}</button>
+                </div>`;
+
+            document.getElementById('grow-shop').innerHTML = GROW_ITEMS.map(i => createCard(i, 'grow', 'var(--neon-green)', 'btn-buy-grow', `buyItem('${i.id}', 'grow')`, '0 $')).join('');
+            document.getElementById('sell-shop').innerHTML = SELL_ITEMS.map(i => createCard(i, 'sell', 'var(--neon-gold)', 'btn-buy-sell', `buyItem('${i.id}', 'sell')`, '0 $')).join('');
+            document.getElementById('network-shop').innerHTML = NETWORK_ITEMS.map(i => `
+                <div class="card" style="border-left-color: var(--neon-blue);">
+                    <div class="card-icon" style="color:var(--neon-blue); box-shadow: inset 0 0 10px rgba(0,243,255,0.2);">${i.icon}</div>
+                    <div class="card-info">
+                        <h4>${i.name} <span style="color:var(--neon-blue); font-size:11px; font-weight:900;">lvl <span id="count-${i.id}">0/${i.maxLevel}</span></span></h4>
+                        <p style="color:var(--text-muted)">${i.desc}</p>
+                    </div>
+                    <button class="card-buy btn-buy-net" id="buy-${i.id}" onclick="buyContact('${i.id}')">0 👑</button>
+                </div>`).join('');
         }
 
-        // Admin
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        // --- INTERACTION ---
+        function spawnAnim(x, y, text, color) {
+            const p = document.createElement('div');
+            p.className = 'particle'; p.innerText = text; p.style.color = color;
+            p.style.left = (x + (Math.random()*20-10)) + 'px'; p.style.top = (y - 20) + 'px';
+            document.body.appendChild(p);
+            setTimeout(()=>p.remove(), 1000);
+        }
+
+        document.getElementById('btn-grow').addEventListener('pointerdown', (e) => {
+            game.weed += clickGpc; spawnAnim(e.clientX, e.clientY, '+'+formatVal(clickGpc), 'var(--neon-green)');
+            updateUI();
+        });
+
+        document.getElementById('btn-sell').addEventListener('pointerdown', (e) => {
+            let qtyToSell = Math.min(game.weed, clickSpc);
+            if(qtyToSell >= 1) {
+                game.weed -= qtyToSell; 
+                let rev = qtyToSell * currentPrice;
+                game.cash += rev;
+                
+                game.sellTransactionCount += 1;
+
+                spawnAnim(e.clientX, e.clientY, '+'+formatVal(rev)+'$', 'var(--neon-gold)');
+                updateUI();
+            } else {
+                spawnAnim(e.clientX, e.clientY, 'Rupture', 'var(--neon-red)');
+            }
+        });
+
+        function buyItem(id, type) {
+            const itemList = type === 'grow' ? GROW_ITEMS : SELL_ITEMS;
+            const item = itemList.find(i => i.id === id);
+            if(game.inventory[id] >= item.maxLevel) return;
+            
+            const cost = getCost(item.cost, game.inventory[id]);
+            if (game.cash >= cost) {
+                game.cash -= cost; game.inventory[id]++;
+                calcStats(); updateUI(); saveGame();
+            }
+        }
+        function buyContact(id) {
+            const item = NETWORK_ITEMS.find(i => i.id === id);
+            if(game.inventory[id] >= item.maxLevel) return;
+            
+            let cost = getRepCost(item.baseCostRep, game.inventory[id]);
+            if (game.rep >= cost) {
+                game.rep -= cost; game.inventory[id]++;
+                calcStats(); updateUI(); saveGame();
+            }
+        }
+        
+        function buyVigile() {
+            if(game.cash >= 2000) {
+                game.cash -= 2000;
+                game.vigileDeadline = Date.now() + (15 * 60 * 1000);
+                if(game.gangTrackerDeadline > Date.now()) {
+                    game.gangTrackerDeadline = 0;
+                    showToast("🛡️ Le Vigile a repoussé le gang ! Tu es sauf.", "var(--neon-blue)");
+                }
+                updateUI(); saveGame();
+            } else {
+                showToast("⚠️ Fonds insuffisants !", "var(--neon-red)");
+            }
+        }
+
+        function bribePolice() {
+            let cost = getBribeCost();
+            if(game.cash >= cost && game.heat > 0) {
+                game.cash -= cost;
+                game.heat = 0;
+                updateUI(); saveGame();
+                showToast("La police regarde ailleurs. Heat à 0%.", "var(--neon-blue)");
+            } else if (game.cash < cost) {
+                showToast("⚠️ Fonds insuffisants !", "var(--neon-red)");
+            }
+        }
+
+        // --- EVENTS (PHONE) ---
+        function generateEvent() {
+            if (Math.random() < 0.2 && game.activeEvents.length < 5 && (game.cash > 50 || game.weed > 20 || game.rep > 0)) {
+                let templates = EVENT_TEMPLATES;
+                
+                const now = Date.now();
+                
+                if (now - game.lastThreatTime < 2 * 60 * 1000) { 
+                    templates = templates.filter(t => !t.isCop); 
+                }
+                if (now - game.lastTrapTime < 5 * 60 * 1000 || Math.abs(now - game.lastGangTime) < 2 * 60 * 1000) {
+                    templates = templates.filter(t => !t.isTrap);
+                }
+                if (now - game.lastGangTime < 5 * 60 * 1000 || Math.abs(now - game.lastTrapTime) < 2 * 60 * 1000) {
+                    templates = templates.filter(t => !t.isGang);
+                }
+
+                if(templates.length === 0) return;
+                let evTpl = templates[Math.floor(Math.random() * templates.length)];
+                
+                if(evTpl.isTrap && Math.random() > 0.1) {
+                    let safeTpls = templates.filter(t => !t.isTrap && !t.isGang && !t.isCop);
+                    if(safeTpls.length > 0) evTpl = safeTpls[Math.floor(Math.random() * safeTpls.length)];
+                }
+                
+                if(evTpl.isCop) game.lastThreatTime = now;
+                if(evTpl.isTrap) game.lastTrapTime = now;
+                if(evTpl.isGang) game.lastGangTime = now;
+
+                game.activeEvents.unshift({ 
+                    ...evTpl, 
+                    uid: Date.now(), 
+                    negotiated: false,
+                    isNegotiating: false,
+                    negoFailed: false,
+                    read: false,
+                    history: [{ sender: 'them', text: evTpl.initText }]
+                });
+                
+                if(document.getElementById('view-phone').classList.contains('active')) renderEventsList();
+                document.getElementById('notif-phone').style.display = 'block';
+                saveGame();
+            }
+        }
+        
+        const NEGO_DIALOGS = {
+            agressif: { chance: 0.35,
+                me: ["Soit tu craches plus, soit tu bouffes la pelouse.", "Je perds pas mon temps avec les pinces. Allonge la monnaie.", "C'est pas la charité ici. Monte le prix."],
+                win: ["Wow calme frère, c'est bon pour ton prix.", "Vas-y on fait comme ça, t'énerve pas.", "C'est bon c'est bon, j'ai les sous."],
+                lose: ["Parle bien, garde ta came.", "T'es trop agressif, ciao.", "Va te faire foutre."]
+            },
+            commercial: { chance: 0.65,
+                me: ["Frérot, la frappe se paye. Fais un effort.", "T'as vu l'odeur ? Tu trouveras pas mieux.", "C'est du premium, faut rallonger."],
+                win: ["C'est vrai qu'elle tape... ok vas-y.", "Tu m'as convaincu. Marché conclu.", "Ok pour cette fois parce que c'est de la bonne."],
+                lose: ["Ouais ouais on dit tous ça. J'ai pas plus.", "Trop cher pour moi, lâche l'affaire.", "Je préfère fumer du foin alors, salut."]
+            },
+            bluff: { chance: 0.50,
+                me: ["J'ai un autre client qui m'attend pour plus cher.", "Dépêche, le téléphone sonne pour ce pochon.", "Si tu prends pas, le prochain le fera."],
+                win: ["Putain... ok la donne pas à l'autre.", "Vas-y je m'aligne, casse les couilles.", "Ok je prends, passe-la moi, vite."],
+                lose: ["Bah vends-lui alors, m'en fous.", "Mytho. Garde-la.", "Tant mieux pour toi, je bouge."]
+            }
+        };
+
+        let currentOpenChatUid = null;
+
+        function renderEventsList() {
+            const container = document.getElementById('messages-container');
+            const empty = document.getElementById('empty-messages');
+            
+            const hasUnread = game.activeEvents.some(e => !e.read);
+            document.getElementById('notif-phone').style.display = hasUnread ? 'block' : 'none';
+
+            if(game.activeEvents.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+            
+            container.innerHTML = game.activeEvents.map(ev => {
+                const lastMsg = ev.history[ev.history.length - 1];
+                const iconMatch = ev.sender.match(/^(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/);
+                const icon = iconMatch ? iconMatch[0] : '👤';
+                const nameText = ev.sender.replace(icon, '').trim();
+
+                const isVisualThreat = ev.isCop || ev.isGang || ev.isTrap;
+
+                return `
+                <div class="chat-preview ${isVisualThreat ? 'threat' : ''}" onclick="openChat(${ev.uid})">
+                    <div class="chat-preview-icon">${icon}</div>
+                    <div class="chat-preview-info">
+                        <div class="chat-preview-name">${nameText}</div>
+                        <div class="chat-preview-text">${lastMsg.sender === 'me' ? 'Vous: ' : ''}${lastMsg.text}</div>
+                    </div>
+                    ${!ev.read ? `<div class="chat-unread"></div>` : ''}
+                </div>
+            `}).join('');
+        }
+
+        function openChat(uid) {
+            const ev = game.activeEvents.find(e => e.uid === uid);
+            if(!ev) return;
+            
+            currentOpenChatUid = uid;
+            ev.read = true;
+            renderEventsList(); 
+            saveGame();
+
+            const iconMatch = ev.sender.match(/^(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/);
+            document.getElementById('detail-icon').innerText = iconMatch ? iconMatch[0] : '👤';
+            document.getElementById('detail-name').innerText = ev.sender.replace(iconMatch ? iconMatch[0] : '', '').trim();
+            
+            if(ev.isCop || ev.isGang || ev.isTrap) document.getElementById('detail-name').style.color = "var(--neon-red)";
+            else document.getElementById('detail-name').style.color = "#fff";
+
+            renderChatDetail();
+            
+            document.getElementById('phone-detail-view').classList.add('active');
+        }
+
+        function closeChat() {
+            document.getElementById('phone-detail-view').classList.remove('active');
+            currentOpenChatUid = null;
+        }
+
+        function renderChatDetail() {
+            if(!currentOpenChatUid) return;
+            const ev = game.activeEvents.find(e => e.uid === currentOpenChatUid);
+            if(!ev) { closeChat(); return; }
+
+            // Render Thread
+            document.getElementById('detail-thread').innerHTML = ev.history.map(msg => `
+                <div class="chat-msg ${msg.sender === 'me' ? 'chat-me' : 'chat-them'}">
+                    ${msg.text}
+                </div>
+            `).join('');
+
+            // Scroll to bottom
+            const threadContainer = document.getElementById('detail-thread');
+            threadContainer.scrollTop = threadContainer.scrollHeight;
+
+            // Render Actions
+            let actionsHtml = `
+                <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px; font-weight:700; background:rgba(0,0,0,0.5); padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                    👉 Demande : <span style="color:#fff;">${ev.reqWeed > 0 ? ev.reqWeed+'g ' : ''} ${ev.reqCash > 0 ? ev.reqCash+'$ ' : ''}</span><br>
+                    🎁 Gain : <span style="color:var(--neon-green);">${ev.rewardCash > 0 ? '+'+ev.rewardCash+'$ ' : ''}</span> <span style="color:var(--neon-blue);">${ev.rewardRep > 0 ? '+'+ev.rewardRep+'👑' : ''}</span>
+                </div>
+                <div class="msg-actions">
+            `;
+
+            if(ev.isNegotiating) {
+                actionsHtml += `
+                    <div style="width:100%; font-size:10px; text-align:center; color:var(--text-muted); margin-bottom:5px;">Choisis ton approche :</div>
+                    <button class="btn-msg" style="background:rgba(255,0,60,0.1); color:var(--neon-red); border:1px solid rgba(255,0,60,0.3);" onclick="handleNegoChoice(${ev.uid}, 'agressif')">🤬 Agressif</button>
+                    <button class="btn-msg btn-nego" onclick="handleNegoChoice(${ev.uid}, 'commercial')">🤝 Commercial</button>
+                    <button class="btn-msg" style="background:rgba(186, 38, 255, 0.1); color:var(--neon-purple); border:1px solid rgba(186, 38, 255, 0.3);" onclick="handleNegoChoice(${ev.uid}, 'bluff')">🃏 Bluff</button>
+                `;
+            } else if (ev.negoFailed) {
+                actionsHtml += `<div style="width:100%; color:var(--neon-red); font-weight:bold; font-size:12px; text-align:center; padding: 10px;">Le contact a coupé court à la conversation.</div>`;
+            } else {
+                let isThreatCheck = ev.isCop || ev.isGang || ev.isTrap;
+                actionsHtml += `
+                    <button class="btn-msg btn-accept" onclick="handleEvent(${ev.uid}, 'accept')">${isThreatCheck ? 'Accepter' : 'Accepter'}</button>
+                    ${!ev.negotiated && !isThreatCheck ? `<button class="btn-msg btn-nego" onclick="handleEvent(${ev.uid}, 'start_nego')">Négocier</button>` : ''}
+                    <button class="btn-msg btn-decline" onclick="handleEvent(${ev.uid}, 'decline')">Ignorer / Refuser</button>
+                `;
+            }
+            actionsHtml += `</div>`;
+            document.getElementById('detail-actions').innerHTML = actionsHtml;
+        }
+
+        function handleNegoChoice(uid, type) {
+            const index = game.activeEvents.findIndex(e => e.uid === uid);
+            if(index === -1) return;
+            const ev = game.activeEvents[index];
+
+            ev.isNegotiating = false;
+            ev.negotiated = true;
+
+            const dialog = NEGO_DIALOGS[type];
+            const myText = dialog.me[Math.floor(Math.random() * dialog.me.length)];
+            ev.history.push({ sender: 'me', text: myText });
+
+            if(Math.random() < dialog.chance) {
+                const winText = dialog.win[Math.floor(Math.random() * dialog.win.length)];
+                ev.history.push({ sender: 'them', text: winText });
+                
+                let finalCash = ev.negCash !== undefined ? ev.negCash : Math.floor(ev.rewardCash * 1.4);
+                let finalWeed = ev.negWeed !== undefined ? ev.negWeed : ev.reqWeed;
+                
+                if (finalCash > 0) ev.rewardCash = finalCash;
+                if (finalWeed > 0) ev.reqWeed = finalWeed;
+            } else {
+                const loseText = dialog.lose[Math.floor(Math.random() * dialog.lose.length)];
+                ev.history.push({ sender: 'them', text: loseText });
+                ev.negoFailed = true;
+                setTimeout(() => {
+                    const i = game.activeEvents.findIndex(e => e.uid === uid);
+                    if(i !== -1) { game.activeEvents.splice(i, 1); if(currentOpenChatUid===uid) closeChat(); renderEventsList(); saveGame(); }
+                }, 4000);
+            }
+
+            renderChatDetail(); renderEventsList(); updateUI(); saveGame();
+        }
+
+        function handleEvent(uid, action) {
+            const index = game.activeEvents.findIndex(e => e.uid === uid);
+            if(index === -1) return;
+            const ev = game.activeEvents[index];
+            
+            if(action === 'accept') {
+                if(game.weed >= ev.reqWeed && game.cash >= ev.reqCash) {
+                    game.weed -= ev.reqWeed; game.cash -= ev.reqCash;
+                    
+                    if(ev.isTrap) {
+                        game.activeEvents.splice(index, 1);
+                        closeChat(); renderEventsList();
+                        triggerBust("L'indic t'a balancé à la BAC.");
+                        return;
+                    }
+                    
+                    if(ev.isGang) {
+                        game.vigileDeadline = Math.max(game.vigileDeadline, Date.now() + (2 * 60 * 1000)); // 2 mins protection
+                        gangBonusDeadline = Date.now() + (7 * 1000); // 7s x2 cash
+                        game.activeEvents.splice(index, 1);
+                        closeChat(); renderEventsList();
+                        calcStats(); updateUI(); saveGame();
+                        showToast("🥷 Protection Gang (2m) & Prix x2 (7s) !", "var(--neon-green)");
+                        return;
+                    }
+
+                    game.cash += ev.rewardCash; game.rep += ev.rewardRep;
+                    game.activeEvents.splice(index, 1);
+                    closeChat();
+                } else { showToast("⚠️ Pas assez de matos/cash pour cet accord !", "var(--neon-red)"); return; }
+            } else if (action === 'start_nego') {
+                ev.isNegotiating = true;
+                renderChatDetail(); return; 
+            } else if (action === 'decline') {
+                if(ev.isTrap) {
+                    game.heat += 5; // Trap declined = +5 heat
+                    game.activeEvents.splice(index, 1);
+                    closeChat(); renderEventsList();
+                    showToast("🚨 Piège esquivé ! Police +5%", "var(--neon-gold)");
+                    updateUI(); saveGame();
+                    return;
+                }
+                if(ev.isCop || ev.isGang) {
+                    game.weed = Math.floor(game.weed * 0.8); game.cash = Math.floor(game.cash * 0.6); 
+                    game.activeEvents.splice(index, 1);
+                    closeChat(); renderEventsList();
+                    
+                    document.getElementById('wanted-overlay').classList.add('active');
+                    setTimeout(() => {
+                        document.getElementById('wanted-overlay').classList.remove('active');
+                        showToast("🚨 Saisie effectuée : -20% Matos, -40% Cash.", "var(--neon-red)");
+                    }, 3000);
+                    
+                    updateUI(); saveGame();
+                    return;
+                }
+                game.activeEvents.splice(index, 1);
+                closeChat();
+            }
+            renderEventsList(); updateUI(); saveGame();
+        }
+
+        // --- BUST & DEBT SYSTEM ---
+        function triggerBust(reasonText) {
+            game.heat = 0;
+            const lostWeed = Math.floor(game.weed * 0.2);
+            const lostCash = Math.floor(game.cash * 0.4);
+            game.weed -= lostWeed;
+            game.cash -= lostCash;
+
+            // Generate Debt (between 2000 and 5000)
+            game.pendingDebt = Math.floor(Math.random() * 3000) + 2000;
+
+            let desc = `T'es tombé. ${reasonText}<br><br>Saisie : <b style="color:var(--neon-green)">${formatVal(lostWeed)}g</b> et <b style="color:var(--neon-gold)">${formatVal(lostCash)}$</b>.<br><br>Le boss réclame <b>${game.pendingDebt}$</b> pour la perte. Tu acceptes la dette (30 min) ou tu refuses (Guerre) ?`;
+            document.getElementById('bust-desc').innerHTML = desc;
+            
+            saveGame(); updateUI(); openModal('bust-modal');
+        }
+
+        function acceptDebtChoice() {
+            game.debt = game.pendingDebt;
+            game.debtDeadline = Date.now() + (30 * 60 * 1000); // 30 mins
+            game.pendingDebt = 0;
+            closeModal('bust-modal');
+            saveGame(); updateUI();
+        }
+
+        function refuseDebtChoice() {
+            game.pendingDebt = 0;
+            game.gangTrackerDeadline = Date.now() + (10 * 60 * 1000); // 10 mins
+            closeModal('bust-modal');
+            showToast("🥷 GANG AUX TROUSSES ! Recrute un Vigile !", "var(--neon-red)");
+            saveGame(); updateUI();
+        }
+
+        function payDebt() {
+            if (game.cash >= game.debt) {
+                game.cash -= game.debt; game.debt = 0; game.debtDeadline = 0;
+                updateUI(); saveGame();
+                showToast("💸 Dette réglée. Le Grand te lâche la grappe.", "var(--neon-green)");
+            } else {
+                showToast("⚠️ Pas assez d'argent ! Produis vite, le temps presse.", "var(--neon-red)");
+            }
+        }
+
+        function handleGameOver() {
+            game.debt = 0; game.debtDeadline = 0; game.gangTrackerDeadline = 0;
+            game.weed = 0; game.cash = 0; game.rep = 0; 
+            updateUI(); saveGame();
+            showToast("💀 TEMPS ÉCOULÉ. T'as tout perdu.", "var(--neon-red)");
+        }
+
+        // --- BANNERS UPDATE ---
+        setInterval(() => {
+            const now = Date.now();
+            let showDebt = game.debt > 0 && game.debtDeadline > now;
+            let showGang = game.gangTrackerDeadline > now;
+            let showVigile = game.vigileDeadline > now;
+            
+            // Gang x2 UI refresh
+            if (gangBonusDeadline > 0) {
+                if (gangBonusDeadline > now) {
+                    calcStats(); // Forces price update
+                } else {
+                    gangBonusDeadline = 0;
+                    calcStats(); // Resets price
+                }
+            }
+            if (vipBonusDeadline > 0) {
+                if (vipBonusDeadline > now) {
+                    calcStats();
+                } else {
+                    vipBonusDeadline = 0;
+                    calcStats();
+                }
+            }
+
+            document.getElementById('banner-debt').style.display = showDebt ? 'flex' : 'none';
+            document.getElementById('banner-gang').style.display = showGang ? 'flex' : 'none';
+            document.getElementById('banner-vigile').style.display = showVigile ? 'flex' : 'none';
+
+            if(showDebt) {
+                let left = game.debtDeadline - now;
+                const m = Math.floor(left / 60000); const s = Math.floor((left % 60000) / 1000);
+                document.getElementById('banner-debt-timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                document.getElementById('banner-debt-amount').innerText = game.debt;
+            } else if (game.debt > 0 && game.debtDeadline > 0 && game.debtDeadline <= now) {
+                handleGameOver(); // Debt expired
+            }
+
+            if(showGang) {
+                let left = game.gangTrackerDeadline - now;
+                const m = Math.floor(left / 60000); const s = Math.floor((left % 60000) / 1000);
+                document.getElementById('banner-gang-timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            } else if (game.gangTrackerDeadline > 0 && game.gangTrackerDeadline <= now) {
+                handleGameOver(); // Gang expired
+            }
+
+            if(showVigile) {
+                let left = game.vigileDeadline - now;
+                const m = Math.floor(left / 60000); const s = Math.floor((left % 60000) / 1000);
+                document.getElementById('banner-vigile-timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+
+        // --- NAVIGATION ---
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            btn.classList.add('active');
+            if(id === 'phone') renderEventsList();
+        }
+
+        // --- ADMIN MODALS ---
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        
+        function openAdminLogin() {
+            closeModal('player-settings-modal');
+            setTimeout(() => openModal('login-modal'), 300);
+        }
 
         function verifyAdmin() {
-            const id = document.getElementById('admin-id').value;
-            const pass = document.getElementById('admin-pass').value;
-            if (id.toLowerCase() === 'admin' && pass === '0000') {
-                closeModal('login-modal');
-                document.getElementById('admin-id').value = '';
-                document.getElementById('admin-pass').value = '';
+            if(document.getElementById('admin-id').value === 'admin' && document.getElementById('admin-pass').value === 'admin316') {
+                closeModal('login-modal'); document.getElementById('admin-id').value = ''; document.getElementById('admin-pass').value = '';
                 document.getElementById('error-msg').style.display = 'none';
-                openModal('settings-modal');
+                setTimeout(() => openModal('settings-modal'), 300);
+            } else { document.getElementById('error-msg').style.display = 'block'; }
+        }
+        function adminAddCash() { const v = parseInt(document.getElementById('add-cash-input').value); if(v>0) { game.cash+=v; updateUI(); saveGame(); document.getElementById('add-cash-input').value=''; showToast("+ Cash injecté", "var(--neon-gold)"); } }
+        function adminAddRep() { const v = parseInt(document.getElementById('add-rep-input').value); if(v>0) { game.rep+=v; updateUI(); saveGame(); document.getElementById('add-rep-input').value=''; showToast("+ Respect injecté", "var(--neon-blue)"); } }
+        
+        let wipeConfirm = false;
+        let wipeTimeout;
+        function adminWipeGame() { 
+            const btn = document.getElementById('btn-wipe');
+            if(!wipeConfirm) {
+                wipeConfirm = true;
+                btn.innerText = "SÛR ? (RECLIQUER)";
+                btn.style.background = "darkred";
+                wipeTimeout = setTimeout(() => { wipeConfirm = false; btn.innerText = "Effacer Sauvegarde"; btn.style.background = "var(--neon-red)"; }, 3000);
             } else {
-                document.getElementById('error-msg').style.display = 'block';
+                clearTimeout(wipeTimeout);
+                wipeConfirm = false;
+                localStorage.removeItem('cartel_tycoon_save');
+                game = { weed: 0, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, lastGangTime: 0, isVIP: false, lastVIPReward: "" };
+                [...GROW_ITEMS, ...SELL_ITEMS, ...NETWORK_ITEMS].forEach(i => game.inventory[i.id] = 0);
+                currentGps = 0; currentSps = 0; currentPrice = 3.5; clickGpc = 1; clickSpc = 1; gangBonusDeadline = 0; vipBonusDeadline = 0;
+                saveGame(); calcStats(); updateUI(); renderShops(); renderEventsList();
+                closeModal('settings-modal');
+                showToast("🗑️ Sauvegarde effacée avec succès.", "var(--neon-red)");
+                btn.innerText = "Effacer Sauvegarde"; btn.style.background = "var(--neon-red)";
             }
         }
 
-        function adminAddGrams() {
-            const val = parseFloat(document.getElementById('add-grams-input').value);
-            if (!isNaN(val) && val > 0) {
-                game.grams += val;
-                game.totalGramsEver += val;
-                calculateStats();
-                updateUI();
-                saveGame();
-                document.getElementById('add-grams-input').value = '';
-                showToast(`🔧 +${formatNumber(val)} g ajoutés`);
-            }
-        }
-
-        function adminAddSeeds() {
-            const val = parseFloat(document.getElementById('add-seeds-input').value);
-            if (!isNaN(val) && val > 0) {
-                game.goldenSeeds += val;
-                calculateStats();
-                updateUI();
-                saveGame();
-                document.getElementById('add-seeds-input').value = '';
-                showToast(`🔧 +${formatNumber(val)} Graines ajoutées`);
-            }
-        }
-
-        function adminWipeGame() {
-            if (confirm("ATTENTION : Cela va supprimer TOUTE la progression, y compris les Graines. Sûr ?")) {
-                localStorage.removeItem('weed_clicker_pro_save');
+        function playerWipeGame() {
+            if(confirm("Attention ! Ceci va effacer toute ta progression. Continuer ?")) {
+                localStorage.removeItem('cartel_tycoon_save');
                 location.reload();
             }
         }
-
-        // Boucle Principale
-        setInterval(() => {
-            if (currentGps > 0) {
-                // Divise l'ajout par 10 (mise à jour toutes les 100ms) pour une animation de nombre plus fluide
-                const addAmount = currentGps / 10; 
-                game.grams += addAmount;
-                game.totalGramsEver += addAmount;
-                calculateStats();
-                updateUI();
+        
+        function adminForceEvent(id) {
+            const tpl = EVENT_TEMPLATES.find(t => t.id === id);
+            if(tpl) {
+                game.activeEvents.unshift({ 
+                    ...tpl, 
+                    uid: Date.now(), 
+                    negotiated: false,
+                    isNegotiating: false,
+                    negoFailed: false,
+                    read: false,
+                    history: [{ sender: 'them', text: tpl.initText }]
+                });
+                renderEventsList();
+                document.getElementById('notif-phone').style.display = 'block';
+                saveGame();
+                showToast('📩 Message forcé reçu !', "var(--neon-green)");
             }
+        }
+
+        // --- MUSIC PLAYER ---
+        function updateVolume() {
+            const audio = document.getElementById('bg-music');
+            const vol = document.getElementById('music-volume').value;
+            audio.volume = vol / 100;
+        }
+
+        function loadTrack() {
+            const audio = document.getElementById('bg-music');
+            const src = document.getElementById('bg-music-src');
+            const track = MUSIC_TRACKS[currentTrackIdx];
+            
+            src.src = track.url;
+            document.getElementById('music-track-name').innerText = track.name;
+            audio.load();
+            if (isMusicPlaying) audio.play().catch(e => console.log('Autoplay bloqué', e));
+        }
+
+        function toggleMusic() {
+            const audio = document.getElementById('bg-music');
+            const btn = document.getElementById('btn-play-music');
+            
+            if(isMusicPlaying) {
+                audio.pause();
+                btn.innerText = '▶️';
+                document.getElementById('music-track-name').innerText = "Radio en pause";
+            } else {
+                if(!audio.src || audio.src === window.location.href) loadTrack();
+                audio.play().catch(e => console.log('Autoplay bloqué', e));
+                btn.innerText = '⏸';
+                document.getElementById('music-track-name').innerText = MUSIC_TRACKS[currentTrackIdx].name;
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+        function changeTrack(direction) {
+            currentTrackIdx += direction;
+            if (currentTrackIdx < 0) currentTrackIdx = MUSIC_TRACKS.length - 1;
+            if (currentTrackIdx >= MUSIC_TRACKS.length) currentTrackIdx = 0;
+            loadTrack();
+        }
+        
+        document.getElementById('bg-music').addEventListener('ended', () => {
+            changeTrack(1);
+        });
+
+        // --- VIP SYSTEM ---
+        function buyVIP() {
+            if(game.isVIP) {
+                showToast("Tu es déjà membre VIP !", "var(--neon-blue)");
+                return;
+            }
+            showToast("Redirection vers PayPal...", "var(--neon-gold)");
+            setTimeout(() => {
+                if(confirm("[Simulation] Paiement PayPal réussi ? (Clique sur OK pour valider le test)")) {
+                    game.isVIP = true;
+                    saveGame(); updateUI();
+                    showToast("👑 Félicitations ! Tu es désormais VIP.", "var(--neon-gold)");
+                    checkVIPReward();
+                }
+            }, 1500);
+        }
+
+        function checkVIPReward() {
+            if (!game.isVIP) return;
+            
+            const now = new Date();
+            const todayString = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
+            
+            if (now.getHours() >= 18) {
+                if (game.lastVIPReward !== todayString) {
+                    game.lastVIPReward = todayString;
+                    
+                    vipBonusDeadline = Date.now() + (5 * 60 * 1000); 
+                    game.vigileDeadline = Math.max(game.vigileDeadline, Date.now() + (10 * 60 * 1000));
+                    
+                    showToast("👑 CADEAU VIP QUOTIDIEN : Prix x1.35 (5m) et Invincibilité (10m) !", "var(--neon-gold)");
+                    calcStats(); updateUI(); saveGame();
+                }
+            }
+        }
+
+        function toggleAdminAutoClick() {
+            adminAutoClickerOn = !adminAutoClickerOn;
+            let btn = document.getElementById('btn-autoclick');
+            if(adminAutoClickerOn) {
+                btn.innerText = "🛑 Stoppe Auto-Clicker Extreme";
+                btn.style.background = "var(--neon-red)"; btn.style.boxShadow = "0 0 20px var(--neon-red)";
+            } else {
+                btn.innerText = "⚡ Auto-Clicker Extreme ⚡";
+                btn.style.background = "linear-gradient(90deg, #8b5cf6, #d946ef)"; btn.style.boxShadow = "0 0 15px rgba(217, 70, 239, 0.4)";
+            }
+        }
+
+        // --- MAIN LOOP (10 ticks / sec) ---
+        setInterval(() => {
+            if (game.heat >= 100 && game.pendingDebt === 0 && game.debt === 0 && game.gangTrackerDeadline === 0) { 
+                triggerBust("T'as fait trop de bruit. La BAC a débarqué au local.");
+                return;
+            }
+
+            if (currentGps > 0) game.weed += currentGps / 10;
+            
+            if (adminAutoClickerOn) {
+                game.weed += clickGpc * 10; 
+                if(Math.random() < 0.3 && document.getElementById('view-lab').classList.contains('active')) {
+                    let r = document.getElementById('btn-grow').getBoundingClientRect();
+                    spawnAnim(r.left + r.width/2, r.top + r.height/2, '+'+formatVal(clickGpc*10), 'var(--neon-green)');
+                    document.getElementById('btn-grow').classList.add('sim-active');
+                    setTimeout(()=>document.getElementById('btn-grow').classList.remove('sim-active'), 50);
+                }
+            }
+            
+            if (currentSps > 0 && game.weed > 0) {
+                let amountWanted = currentSps / 10; let actualAmount = Math.min(amountWanted, game.weed);
+                game.weed -= actualAmount; game.cash += actualAmount * currentPrice;
+                game.sellTransactionCount += 0.1;
+            }
+            
+            if (game.sellTransactionCount >= 15) {
+                let chunks = Math.floor(game.sellTransactionCount / 15);
+                game.sellTransactionCount %= 15;
+                
+                if (game.vigileDeadline < Date.now()) { 
+                    let heatGain = chunks * 5; 
+                    if (game.inventory['comptable']) heatGain *= Math.pow(0.8, game.inventory['comptable']);
+                    game.heat += heatGain;
+                }
+            }
+            
+            updateUI();
         }, 100);
 
-        // Sauvegarde toutes les 5 secondes
-        setInterval(saveGame, 5000);
-        
-        // Check des succès moins fréquent (chaque seconde)
-        setInterval(checkAchievements, 1000);
+        setInterval(() => { 
+            saveGame(); 
+            generateEvent(); 
+            checkVIPReward(); 
+        }, 12000); 
 
-        // Initialisation
-        loadGame();
-        buildShop();
-        buildAchievements();
-        calculateStats();
-        updateUI();
-
+        // INIT
+        loadSave(); renderShops(); calcStats(); updateUI(); renderEventsList();
+        document.getElementById('music-volume').value = 30;
+        updateVolume(); 
     </script>
 </body>
 </html>
