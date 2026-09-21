@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>Cartel Tycoon RPG - Street Edition by TGV</title>
+    <title>Cartel Tycoon RPG - by TGV</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         /* --- DESIGN SYSTEM : URBAN NEON --- */
@@ -19,37 +19,35 @@
             --text-main: #ffffff;
             --text-muted: #6b6b7b;
             --border-light: rgba(255, 255, 255, 0.05);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
         }
 
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: 'Montserrat', sans-serif; }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: 'Arial', sans-serif; }
 
         body { margin: 0; padding: 0; background-color: var(--bg-base); color: var(--text-main); height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 25px 25px; }
 
         /* --- UI ELEMENTS --- */
-        .top-bar { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; background: rgba(5,5,7,0.8); backdrop-filter: blur(10px); z-index: 10; }
+        .top-bar { padding: 15px 20px; border-bottom: 1px solid var(--border-light); position: sticky; top: 0; background: rgba(5,5,7,0.9); backdrop-filter: blur(10px); z-index: 10; flex-shrink: 0;}
         .header-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .header-title h1 { margin: 0; font-size: 1.2rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-        
-        .admin-icon { font-size: 20px; cursor: pointer; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); transition: 0.2s; }
+        .admin-icon { font-size: 20px; cursor: pointer; transition: 0.2s; }
         .admin-icon:active { transform: rotate(90deg) scale(1.1); }
 
-        .stats-row { display: flex; gap: 10px; }
-        .stat-badge { background: var(--bg-surface); flex: 1; padding: 10px 5px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
-        .stat-badge span { font-size: 8px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
-        .stat-badge strong { font-size: 14px; font-weight: 900; }
+        .stats-row { display: flex; gap: 8px; }
+        .stat-badge { background: var(--bg-surface); flex: 1; padding: 10px 5px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .stat-badge span { display: block; font-size: 8px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .stat-badge strong { font-size: 13px; font-weight: 900; }
         
         .val-weed { color: var(--neon-green); text-shadow: 0 0 8px rgba(57, 255, 20, 0.4); }
         .val-cash { color: var(--neon-gold); text-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
+        .val-heat { color: #fff; }
         .val-rep { color: var(--neon-blue); text-shadow: 0 0 8px rgba(0, 243, 255, 0.4); }
         .vip-badge-header { display: none; font-size: 10px; font-weight: 900; background: linear-gradient(90deg, #ffd700, #ff8c00); -webkit-background-clip: text; color: transparent; margin-left: 5px; animation: shine 2s infinite linear; }
-        @keyframes shine { 0% { filter: brightness(1); } 50% { filter: brightness(1.5); text-shadow: 0 0 10px rgba(255,215,0,0.5); } 100% { filter: brightness(1); } }
+        @keyframes shine { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); text-shadow: 0 0 10px rgba(255,215,0,0.5); } }
 
         /* --- BANNERS FOR TIMERS --- */
-        .status-banner { background: rgba(10, 10, 12, 0.95); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: none; }
+        .status-banner { background: rgba(10, 10, 12, 0.95); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; border-radius: 12px; margin-bottom: 15px; display: none; }
         .status-banner.danger { border: 1px solid var(--neon-red); box-shadow: 0 0 15px rgba(255,0,60,0.3); color: var(--neon-red); }
         .status-banner.warning { border: 1px solid var(--neon-gold); box-shadow: 0 0 15px rgba(255,215,0,0.3); color: var(--neon-gold); }
-        .status-banner.safe { border: 1px solid var(--neon-blue); box-shadow: 0 0 15px rgba(0,243,255,0.3); color: var(--neon-blue); }
         .banner-btn { padding: 8px 12px; font-size: 10px; border-radius: 8px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
         /* --- MAIN CONTAINER --- */
@@ -58,151 +56,100 @@
         .view.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- LABO (CLICKER) --- */
-        .clicker-zone { text-align: center; padding: 30px 0; background: radial-gradient(circle, rgba(57, 255, 20, 0.05) 0%, rgba(0,0,0,0) 70%); margin-bottom: 20px; position: relative;}
-        .clicker-zone::after { content:''; position: absolute; bottom: 0; left: 10%; width: 80%; height: 1px; background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.2), transparent); }
+        /* --- CLICKERS --- */
+        .clicker-zone { text-align: center; padding: 30px 0; background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, rgba(0,0,0,0) 70%); margin-bottom: 20px; position: relative;}
         .clicker-btn { width: 140px; height: 140px; border-radius: 50%; background: var(--bg-card); border: 2px solid rgba(255,255,255,0.1); font-size: 60px; color: #fff; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.1s; position: relative; z-index: 1;}
-        
-        .clicker-btn:active { transform: scale(0.92); border-color: rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .clicker-btn.sim-active { transform: scale(0.92); border-color: rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .clicker-zone .clicker-btn::before { content:''; position:absolute; top:-5px; left:-5px; width:150px; height:150px; border-radius:50%; background: var(--neon-green); opacity: 0.1; filter: blur(10px); z-index: -1;}
-        .rate-display { font-size: 11px; font-weight: 700; color: #fff; margin-top: 20px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 20px; display: inline-block; border: 1px solid rgba(57, 255, 20, 0.2); }
+        .clicker-btn:active, .clicker-btn.sim-active { transform: scale(0.92); border-color: rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .clicker-zone.lab .clicker-btn::before { content:''; position:absolute; top:-5px; left:-5px; width:150px; height:150px; border-radius:50%; background: var(--neon-green); opacity: 0.1; filter: blur(10px); z-index: -1;}
+        .rate-display { font-size: 11px; font-weight: 700; color: #fff; margin-top: 20px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255, 255, 255, 0.1); }
 
-        .drying-container { background: rgba(0,0,0,0.5); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-top: 15px; text-align: left; }
-        .drying-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
-        .drying-bar-bg { background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden; position: relative; }
-        .drying-bar-fill { background: var(--neon-green); height: 100%; width: 0%; box-shadow: 0 0 10px var(--neon-green); transition: width 0.1s linear; }
-
-        /* --- STREET (SHOP) --- */
+        /* --- SHOP CARDS --- */
         .section-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin: 25px 0 15px 5px; display: flex; align-items: center; gap: 8px; }
         .section-title::after { content:''; flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
-
         .list-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-        .card { background: var(--bg-surface); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+        .card { background: var(--bg-surface); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
         .card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; }
         .card-icon { font-size: 30px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px; flex-shrink: 0; }
         .card-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .card-info h4 { margin: 0 0 4px 0; font-size: 14px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: space-between; }
-        
+        .card-info h4 { margin: 0 0 4px 0; font-size: 14px; font-weight: 800; color: #fff; display: flex; justify-content: space-between; }
         .card-info p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600; line-height: 1.4; }
         .card-buy { padding: 10px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; border: none; cursor: pointer; text-transform: uppercase; transition: 0.1s; flex-shrink: 0; }
         .card-buy:active { transform: scale(0.95); }
-        .card-buy:disabled { background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.2) !important; box-shadow: none !important; cursor: not-allowed; }
-        .btn-buy-grow { background: rgba(57, 255, 20, 0.1); color: var(--neon-green); border: 1px solid rgba(57, 255, 20, 0.3); }
-        .btn-buy-sell { background: rgba(255, 215, 0, 0.1); color: var(--neon-gold); border: 1px solid rgba(255, 215, 0, 0.3); }
-        .btn-buy-net { background: rgba(0, 243, 255, 0.1); color: var(--neon-blue); border: 1px solid rgba(0, 243, 255, 0.3); }
-
-        /* --- PHONE / MESSAGES APP UI --- */
-        #view-phone { padding: 0; display: none; flex-direction: column; height: calc(100vh - 130px - 70px); position: relative; }
-        #view-phone.active { display: flex; animation: slideUp 0.3s ease-out; }
-        .phone-header { background: rgba(0, 0, 0, 0.8); border-bottom: 1px solid var(--border-light); padding: 15px 20px; text-align: center; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10; }
-        .chat-list-view { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .chat-preview { background: var(--bg-card); padding: 15px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; gap: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; }
-        .chat-preview:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
+        .card-buy:disabled { opacity: 0.5; cursor: not-allowed; }
         
+        /* --- PHONE / MESSAGES --- */
+        #view-phone { padding: 0; display: none; flex-direction: column; height: calc(100vh - 130px - 70px); position: relative; }
+        #view-phone.active { display: flex; }
+        .phone-header { background: rgba(0, 0, 0, 0.8); padding: 15px; text-align: center; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid var(--border-light); z-index: 10; display: flex; justify-content: space-between;}
+        .chat-list-view { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-preview { background: var(--bg-card); padding: 15px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; }
+        .chat-preview:active { transform: scale(0.98); }
         .chat-preview.threat { border-left: 4px solid var(--neon-red); }
         .chat-preview-icon { font-size: 24px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); border-radius: 50%; flex-shrink: 0; }
         .chat-preview-info { flex: 1; overflow: hidden; }
         .chat-preview-name { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .chat-preview.threat .chat-preview-name { color: var(--neon-red); }
         .chat-preview-text { font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-unread { width: 10px; height: 10px; background: var(--neon-blue); border-radius: 50%; box-shadow: 0 0 8px var(--neon-blue); flex-shrink: 0; }
+        
+        /* Chat Detail */
         .chat-detail-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-base); display: none; flex-direction: column; z-index: 20; background-image: inherit; background-size: inherit; }
         .chat-detail-view.active { display: flex; animation: slideInRight 0.3s ease-out; }
         @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .chat-detail-header { background: rgba(0, 0, 0, 0.9); border-bottom: 1px solid var(--border-light); padding: 15px 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-shrink: 0; }
-        
-        .btn-back { background: none; border: none; color: var(--neon-blue); font-size: 20px; cursor: pointer; padding: 0 10px 0 0; }
-        .chat-thread-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .chat-msg { padding: 12px 16px; border-radius: 18px; font-size: 13px; font-weight: 600; width: fit-content; max-width: 85%; line-height: 1.4; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .chat-detail-header { background: rgba(0, 0, 0, 0.9); padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border-light); }
+        .btn-back { background: none; border: none; color: var(--neon-blue); font-size: 20px; cursor: pointer; }
+        .chat-thread { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { padding: 12px 16px; border-radius: 18px; font-size: 13px; font-weight: 600; max-width: 85%; line-height: 1.4; }
         .chat-them { background: var(--bg-card); color: #ddd; border-bottom-left-radius: 4px; align-self: flex-start; border: 1px solid rgba(255,255,255,0.05); }
         .chat-me { background: rgba(0,243,255,0.1); color: var(--neon-blue); border-bottom-right-radius: 4px; align-self: flex-end; border: 1px solid rgba(0,243,255,0.2); }
-        .chat-actions-container { background: rgba(10,10,12,0.95); padding: 15px; border-top: 1px solid var(--border-light); flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding-bottom: 25px; }
+        .chat-actions { background: rgba(10,10,12,0.95); padding: 15px; border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 10px; padding-bottom: 25px; }
         .msg-actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn-msg { flex: 1; min-width: 30%; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 11px; border: none; cursor: pointer; text-transform: uppercase; transition: 0.1s;}
         .btn-msg:active { transform: scale(0.95); }
-        .btn-accept { background: rgba(57, 255, 20, 0.1); color: var(--neon-green); border: 1px solid rgba(57, 255, 20, 0.3); }
-        .btn-decline { background: rgba(255, 0, 60, 0.1); color: var(--neon-red); border: 1px solid rgba(255, 0, 60, 0.3); }
-        .btn-nego { background: rgba(255, 215, 0, 0.1); color: var(--neon-gold); border: 1px solid rgba(255, 215, 0, 0.3); }
 
-        /* --- TABS (BOTTOM NAV) --- */
-        .tabs { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: rgba(5, 5, 7, 0.7); backdrop-filter: blur(15px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); z-index: 50;}
-        .tab-btn { background: none; border: none; color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; position: relative;}
-        .tab-btn.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-        .tab-btn.active::after { content: ''; position: absolute; top: -1px; left: 0; width: 100%; height: 2px; background: #fff; box-shadow: 0 0 10px #fff; }
-        .tab-icon { font-size: 18px; }
+        /* --- TABS --- */
+        .tabs { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: rgba(5, 5, 7, 0.9); backdrop-filter: blur(15px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); z-index: 50;}
+        .tab-btn { background: none; border: none; color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; position: relative;}
+        .tab-btn.active { color: #fff; }
         .notif-dot { position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: var(--neon-blue); border-radius: 50%; display: none; box-shadow: 0 0 10px var(--neon-blue); }
 
         /* --- MODALS --- */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(10px); }
         .modal.active { opacity: 1; visibility: visible; }
-        .modal-content { background: var(--bg-card); padding: 30px; border-radius: 24px; width: 90%; max-width: 340px; border: 1px solid rgba(255,255,255,0.1); transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 50px rgba(0,0,0,0.8); max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: var(--bg-card); padding: 25px; border-radius: 24px; width: 90%; max-width: 340px; border: 1px solid rgba(255,255,255,0.1); transform: scale(0.9); transition: 0.3s; max-height: 85vh; overflow-y: auto; }
         .modal.active .modal-content { transform: scale(1); }
-        .modal h3 { margin-top: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        .modal-input { width: 100%; padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff; font-weight: 600; font-size: 14px;}
-        .modal-input:focus { outline: none; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
-        .btn-full { width: 100%; padding: 14px; margin-top: 15px; border-radius: 12px; font-weight: 800; text-transform: uppercase; cursor: pointer; border: none; font-size: 13px;}
+        .modal-input { width: 100%; padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff; font-weight: 600;}
+        .btn-full { width: 100%; padding: 14px; margin-top: 10px; border-radius: 12px; font-weight: 800; text-transform: uppercase; cursor: pointer; border: none; font-size: 13px;}
         
-        .bg-green { background: var(--neon-green); color: black; box-shadow: 0 0 15px rgba(57,255,20,0.3); }
-        .bg-red { background: var(--neon-red); box-shadow: 0 0 15px rgba(255,0,60,0.4); }
-        .bg-gray { background: rgba(255,255,255,0.1); color: white; }
-        .bg-purple { background: linear-gradient(90deg, #8b5cf6, #d946ef); box-shadow: 0 0 15px rgba(217, 70, 239, 0.4); color: white; }
-        
-        /* TOAST NOTIFICATIONS */
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.95); padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 800; text-align: center; width: 85%; max-width: 350px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: slideDownToast 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.95); padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 800; text-align: center; width: 85%; max-width: 350px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: slideDownToast 0.3s forwards; }
         @keyframes slideDownToast { 0% { opacity: 0; transform: translate(-50%, -30px); } 100% { opacity: 1; transform: translate(-50%, 0); } }
 
-        /* MUSIC PLAYER STYLES */
-        .music-player { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
-        .music-title { font-size: 11px; color: var(--neon-blue); font-weight: 900; text-transform: uppercase; margin-bottom: 10px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .music-controls { display: flex; justify-content: space-center; align-items: center; gap: 15px; justify-content: center; margin-bottom: 15px; }
-        .music-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
-        .music-btn:active { transform: scale(0.9); }
-        .volume-slider { width: 100%; appearance: none; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; outline: none; }
-        .volume-slider::-webkit-slider-thumb { appearance: none; width: 15px; height: 15px; border-radius: 50%; background: var(--neon-blue); cursor: pointer; }
-
         /* PARTICLES */
-        .particle { position: fixed; font-weight: 900; font-size: 22px; pointer-events: none; z-index: 100; animation: floatParticle 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; text-shadow: 0 0 10px currentColor; }
+        .particle { position: fixed; font-weight: 900; font-size: 22px; pointer-events: none; z-index: 100; animation: floatParticle 1s forwards; text-shadow: 0 0 10px currentColor; }
         @keyframes floatParticle { 0% { opacity: 1; transform: translateY(0) scale(0.8); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
 
         /* WANTED OVERLAY */
         #wanted-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.9); animation: policeLights 0.4s infinite; }
         #wanted-overlay.active { display: flex; }
         .wanted-text { font-size: 60px; font-weight: 900; color: white; text-transform: uppercase; text-shadow: 0 0 30px var(--neon-red), 0 0 10px white; letter-spacing: 5px; margin-bottom: 10px; font-style: italic;}
-        .wanted-sub { font-size: 16px; color: white; font-weight: 700; background: black; padding: 5px 15px; text-transform: uppercase; }
-        @keyframes policeLights { 0% { background: rgba(255, 0, 60, 0.3); } 50% { background: rgba(0, 243, 255, 0.3); } 100% { background: rgba(255, 0, 60, 0.3); } }
+        @keyframes policeLights { 0% { background: rgba(255, 0, 60, 0.4); } 50% { background: rgba(0, 243, 255, 0.4); } 100% { background: rgba(255, 0, 60, 0.4); } }
+        
+        /* MUSIC PLAYER STYLES */
+        .music-player { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+        .music-title { font-size: 11px; color: var(--neon-blue); font-weight: 900; text-transform: uppercase; margin-bottom: 10px; text-align: center; }
+        .music-controls { display: flex; align-items: center; gap: 15px; justify-content: center; margin-bottom: 15px; }
+        .music-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; }
+        .volume-slider { width: 100%; appearance: none; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; outline: none; }
+        .volume-slider::-webkit-slider-thumb { appearance: none; width: 15px; height: 15px; border-radius: 50%; background: var(--neon-blue); }
     </style>
 </head>
 <body>
-
-    <!-- AUTH SCREEN (Shown if not logged in) -->
-    <div id="auth-screen" class="modal active" style="z-index: 9999; background: var(--bg-base);">
-        <div class="modal-content" style="max-width:320px;">
-            <div class="bust-title" style="color:#fff; font-size:20px; font-weight:900; letter-spacing:2px;">
-                LE CARTEL <span style="font-size:10px; color:var(--text-muted);">by TGV</span>
-            </div>
-            <p style="font-size: 12px; color:var(--text-muted); text-align:center; margin-bottom:20px;">
-                Identifie-toi pour monter ton empire et sauvegarder tes progrès.
-            </p>
-            <input type="text" id="auth-username" placeholder="Pseudo" class="modal-input" maxlength="15">
-            <input type="password" id="auth-password" placeholder="Mot de passe" class="modal-input">
-            <p id="auth-error" style="color:var(--neon-red); font-size:11px; font-weight:700; text-align:center; display:none;"></p>
-            <button class="btn-full" style="background:var(--neon-blue); color:black;" onclick="loginUser()">Se Connecter</button>
-            <button class="btn-full bg-green" onclick="registerUser()">S'inscrire</button>
-            <div style="font-size:9px; color:var(--text-muted); margin-top:20px; text-align:center;">Local Edition (Fake Auth)</div>
-        </div>
-    </div>
-
     <!-- AUDIO LOOP -->
-    <audio id="bg-music">
-        <source src="" type="audio/mpeg" id="bg-music-src">
-    </audio>
+    <audio id="bg-music"><source src="" type="audio/mpeg" id="bg-music-src"></audio>
 
     <!-- WANTED OVERLAY -->
     <div id="wanted-overlay">
         <div class="wanted-text">WANTED</div>
-        <div class="wanted-sub" id="wanted-reason">LA BAC A FRAPPÉ</div>
+        <div style="font-size: 16px; color: white; font-weight: 700; background: black; padding: 5px 15px;">SAISIE EN COURS...</div>
     </div>
 
     <!-- TOP BAR STATS -->
@@ -211,27 +158,14 @@
             <h1 style="display:flex; align-items:baseline; gap:8px;">
                 LE CARTEL <span style="font-size:11px; font-weight:700; color:var(--text-muted); font-style:normal; letter-spacing:0; text-shadow:none;">by TGV</span>
                 <span class="vip-badge-header" id="header-vip-tag">VIP</span>
-                <span style="color:var(--neon-purple); font-size:9px; font-weight:700; margin-left:5px;" id="header-user-name"></span>
             </h1>
             <div class="admin-icon" onclick="openModal('player-settings-modal')">⚙️</div>
         </div>
         <div class="stats-row">
-            <div class="stat-badge">
-                <span>Matos</span>
-                <strong class="val-weed" id="ui-weed">0 g</strong>
-            </div>
-            <div class="stat-badge">
-                <span>Biff</span>
-                <strong class="val-cash" id="ui-cash">0 $</strong>
-            </div>
-            <div class="stat-badge">
-                <span>Police</span>
-                <strong class="val-heat" id="ui-heat">0%</strong>
-            </div>
-            <div class="stat-badge" style="display:none;" id="rep-badge">
-                <span>Respect</span>
-                <strong class="val-rep" id="ui-rep">0 👑</strong>
-            </div>
+            <div class="stat-badge"><span>Matos</span><strong class="val-weed" id="ui-weed">0 g</strong></div>
+            <div class="stat-badge"><span>Biff</span><strong class="val-cash" id="ui-cash">0 $</strong></div>
+            <div class="stat-badge"><span>Police</span><strong class="val-heat" id="ui-heat">0%</strong></div>
+            <div class="stat-badge" style="display:none;" id="rep-badge"><span>Respect</span><strong class="val-rep" id="ui-rep">0 👑</strong></div>
         </div>
     </div>
 
@@ -240,34 +174,17 @@
         <div>💸 DETTE: <span id="banner-debt-amount" style="color:#fff;">0</span>$ - <span id="banner-debt-timer">00:00</span></div>
         <button class="banner-btn" style="background:var(--neon-gold); color:black;" onclick="payDebt()">Payer</button>
     </div>
-    <div id="banner-gang" class="status-banner danger">
-        <div>🥷 GANG AUX TROUSSES - <span id="banner-gang-timer">00:00</span></div>
-        <button class="banner-btn" style="background:var(--neon-red); color:white;" onclick="switchTab('network', document.getElementById('tab-network-btn'))">Recruter</button>
-    </div>
-    <div id="banner-vigile" class="status-banner safe">
-        <div>🛡️ VIGILE ACTIF (0 Police) - <span id="banner-vigile-timer">00:00</span></div>
+    <div id="banner-vigile" class="status-banner" style="border-color:var(--neon-blue); color:var(--neon-blue);">
+        <div>🛡️ VIGILE ACTIF (Police bloquée) - <span id="banner-vigile-timer">00:00</span></div>
     </div>
 
     <!-- MAIN VIEWS -->
     <div class="main-container">
-        
         <!-- 1. LABO (CULTIVER) -->
         <div id="view-lab" class="view active">
-            <div class="clicker-zone">
+            <div class="clicker-zone lab">
                 <button class="clicker-btn" id="btn-grow">🌿</button>
                 <div class="rate-display">Production : +<span id="ui-gps">0</span> g/s</div>
-                
-                <!-- NEW DRYING UI -->
-                <div class="drying-container">
-                    <div class="drying-header">
-                        <span>En séchage : <b id="ui-drying-amt" style="color:#fff;">0 g</b></span>
-                        <span id="ui-drying-time" style="color:var(--neon-green);">30s</span>
-                    </div>
-                    <div class="drying-bar-bg">
-                        <div class="drying-bar-fill" id="ui-drying-bar"></div>
-                    </div>
-                </div>
-
             </div>
             <h2 class="section-title">Infrastructures du local</h2>
             <div class="list-container" id="grow-shop"></div>
@@ -276,10 +193,10 @@
         <!-- 2. LA RUE (VENDRE) -->
         <div id="view-street" class="view">
             <div class="clicker-zone">
-                <h3 style="margin:0 0 15px 0; font-size:18px; font-weight:900; letter-spacing:1px;">Le Terrain</h3>
+                <h3 style="margin:0 0 15px 0; font-size:18px; font-weight:900;">Le Terrain</h3>
                 <button class="clicker-btn" id="btn-sell">🤝</button>
                 <br>
-                <div class="rate-display" style="border-color: var(--neon-gold);">Écoulement : -<span id="ui-sps" style="color:var(--neon-gold)">0</span> g/s</div>
+                <div class="rate-display" style="border-color: rgba(255,215,0,0.3);">Écoulement : -<span id="ui-sps" style="color:var(--neon-gold)">0</span> g/s</div>
                 <div style="margin-top:10px; font-size:11px; color:var(--text-muted); font-weight:700;">Prix moyen: <span id="ui-price" style="color:var(--neon-gold)">3.5</span>$/g</div>
             </div>
             <h2 class="section-title">Points de vente & dealers</h2>
@@ -291,10 +208,10 @@
             <div id="phone-list-view" style="display:flex; flex-direction:column; height:100%;">
                 <div class="phone-header">
                     <span style="color:var(--neon-blue);">📱 Messagerie Cryptée</span>
-                    <span style="font-size: 10px; color:var(--text-muted); font-weight:bold;">VPN ACTIF</span>
+                    <span style="font-size: 10px; color:var(--text-muted);">VPN ACTIF</span>
                 </div>
-                <div id="empty-messages" style="text-align:center; padding: 50px 20px; color: var(--text-muted); font-size: 15px; font-weight:700;">
-                    📵 Aucune notification.<br><span style="font-size:12px; font-weight:500;">Attire l'attention pour recevoir des messages.</span>
+                <div id="empty-messages" style="text-align:center; padding: 50px 20px; color: var(--text-muted); font-size: 14px; font-weight:700;">
+                    📵 Aucune notification.
                 </div>
                 <div class="chat-list-view" id="messages-container"></div>
             </div>
@@ -302,73 +219,48 @@
             <div id="phone-detail-view" class="chat-detail-view">
                 <div class="chat-detail-header">
                     <button class="btn-back" onclick="closeChat()">❮</button>
-                    <div class="chat-preview-icon" id="detail-icon" style="width:35px; height:35px; font-size:18px;">👤</div>
+                    <div class="chat-preview-icon" id="detail-icon" style="font-size:18px;">👤</div>
                     <div style="font-weight:900; font-size:14px; text-transform:uppercase;" id="detail-name">Contact</div>
                 </div>
-                <div class="chat-thread-container" id="detail-thread"></div>
-                <div class="chat-actions-container" id="detail-actions"></div>
+                <div class="chat-thread" id="detail-thread"></div>
+                <div class="chat-actions" id="detail-actions"></div>
             </div>
         </div>
 
-        <!-- 4. CARTEL (VIP / RÉSEAU / SAISON) -->
+        <!-- 4. CARTEL (VIP / RÉSEAU) -->
         <div id="view-network" class="view">
-            <div style="background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.2); padding: 15px; border-radius: 15px; margin-bottom: 25px; font-size: 12px; line-height: 1.5; font-weight:600;">
-                👑 <b>LE CARTEL</b> : Monte ton empire, assure ta sécurité, et domine chaque saison.
-            </div>
-            
-            <h2 class="section-title">Sécurité & Employés</h2>
+            <h2 class="section-title">Sécurité</h2>
             <div class="list-container">
                 <div class="card" style="border-left-color: var(--neon-blue);">
-                    <div class="card-icon" style="color:var(--neon-blue); box-shadow: inset 0 0 10px rgba(0,243,255,0.2);">🛡️</div>
+                    <div class="card-icon" style="color:var(--neon-blue);">🛡️</div>
                     <div class="card-info">
-                        <h4>Vigile <span style="color:var(--neon-blue); font-size:10px; font-weight:900;">(15 mins)</span></h4>
-                        <p style="color:var(--text-muted)">Annule un gang et bloque la Police pendant 15 minutes.</p>
+                        <h4>Vigile <span style="color:var(--neon-blue); font-size:10px;">(15 mins)</span></h4>
+                        <p style="color:var(--text-muted)">Bloque la montée de Police.</p>
                     </div>
-                    <button class="card-buy btn-buy-net" id="btn-buy-vigile" onclick="buyVigile()">2000 $</button>
+                    <button class="card-buy" style="background:rgba(0,243,255,0.1); color:var(--neon-blue); border:1px solid rgba(0,243,255,0.3);" id="btn-buy-vigile" onclick="buyVigile()">2000 $</button>
                 </div>
             </div>
-
             <div style="background: rgba(255, 0, 60, 0.05); border: 1px solid rgba(255, 0, 60, 0.2); padding: 15px; border-radius: 15px; margin-bottom: 25px;">
-                <h4 style="margin:0 0 10px 0; color:var(--neon-red); font-size:14px; display:flex; align-items:center; gap:5px;">🚓 Corruption (Baisser la Police)</h4>
-                <button class="btn-full bg-gray" style="margin:0; border-color: rgba(255,255,255,0.2);" onclick="bribePolice()">Pot-de-vin (Coût : <span id="bribe-cost">500</span> $)</button>
+                <h4 style="margin:0 0 10px 0; color:var(--neon-red); font-size:14px;">🚓 Corruption (Baisse Police)</h4>
+                <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white;" onclick="bribePolice()">Pot-de-vin (Coût : <span id="bribe-cost">500</span> $)</button>
             </div>
-
-            <h2 class="section-title">VIP & Spécialistes (Permanents)</h2>
+            <h2 class="section-title">Réseau VIP (Permanents)</h2>
             <div class="list-container" id="network-shop"></div>
-            
-            <h2 class="section-title">📅 Saisons (Reset tous les 10 jours)</h2>
-            <div style="background: var(--bg-surface); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); font-size:11px; color:var(--text-muted); line-height:1.5;">
-                <strong style="color:var(--neon-purple);">RÈGLE DU JEU</strong> : Toutes les 10 jours IRL, la carte est nettoyée. La drogue, l'argent, les plantes et les dealers sont effacés. 
-                Seul le <b style="color:var(--neon-blue);">Respect (Niv. VIP)</b> et le <b style="color:var(--neon-blue);">Grade</b> sont conservés. Sois le roi avant le reset !
-                <br><br>
-                Prochain nettoyage global : <span id="ui-season-timer" style="color:#fff; font-weight:900;">00j 00h 00m</span>
-            </div>
         </div>
     </div>
 
     <!-- BOTTOM NAV -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('lab', this)">
-            <span class="tab-icon">🧪</span>Labo
-        </button>
-        <button class="tab-btn" onclick="switchTab('street', this)">
-            <span class="tab-icon">💸</span>La Rue
-        </button>
-        <button class="tab-btn" onclick="switchTab('phone', this)">
-            <span class="tab-icon">📱</span>Messages
-            <div class="notif-dot" id="notif-phone"></div>
-        </button>
-        <button class="tab-btn" id="tab-network-btn" onclick="switchTab('network', this)">
-            <span class="tab-icon">👥</span>Cartel
-        </button>
+        <button class="tab-btn active" onclick="switchTab('lab', this)"><span style="font-size:18px;">🧪</span>Labo</button>
+        <button class="tab-btn" onclick="switchTab('street', this)"><span style="font-size:18px;">💸</span>La Rue</button>
+        <button class="tab-btn" onclick="switchTab('phone', this)"><span style="font-size:18px;">📱</span>Messages<div class="notif-dot" id="notif-phone"></div></button>
+        <button class="tab-btn" onclick="switchTab('network', this)"><span style="font-size:18px;">👥</span>Cartel</button>
     </div>
 
-    <!-- MODALS -->
     <!-- PLAYER SETTINGS MODAL -->
     <div id="player-settings-modal" class="modal">
         <div class="modal-content">
             <h3 style="color: white; margin-bottom: 20px;">Paramètres</h3>
-            
             <div class="music-player">
                 <div class="music-title" id="music-track-name">Radio Éteinte</div>
                 <div class="music-controls">
@@ -376,40 +268,23 @@
                     <button class="music-btn" id="btn-play-music" onclick="toggleMusic()">▶️</button>
                     <button class="music-btn" onclick="changeTrack(1)">⏭</button>
                 </div>
-                <label style="font-size:10px; color:var(--text-muted); margin-bottom:5px; display:block;">VOLUME</label>
-                <input type="range" class="volume-slider" id="music-volume" min="0" max="100" value="30" oninput="updateVolume()" onchange="updateVolume()">
-                
-                <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin: 15px 0;">
-                <label for="import-music-file" class="btn-msg" style="background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.2); display:block; text-align:center; padding: 10px;">
-                    📂 Importer ton MP3
-                </label>
-                <input type="file" id="import-music-file" accept="audio/mpeg,audio/mp4,audio/x-m4a" style="display:none;" onchange="importCustomMusic(this)">
+                <input type="range" class="volume-slider" id="music-volume" min="0" max="100" value="30" oninput="updateVolume()">
+                <label for="import-music-file" style="display:block; text-align:center; padding:10px; margin-top:10px; background:rgba(255,255,255,0.1); color:white; border-radius:8px; font-size:11px;">📂 Importer ton MP3</label>
+                <input type="file" id="import-music-file" accept="audio/*" style="display:none;" onchange="importCustomMusic(this)">
             </div>
-
-            <button class="btn-full" style="background: linear-gradient(90deg, #ffd700, #ff8c00); color: black;" onclick="buyVIP()">
-                👑 Devenir VIP (Paypal)
-            </button>
-            <p style="font-size: 10px; color: var(--text-muted); text-align: center; margin-top: -5px; margin-bottom: 20px;">
-                x1.35 Prix (5m) et Invincibilité (10m) chaque jour à 18h.
-            </p>
-
-            <button class="btn-full bg-red" style="font-size:11px; padding: 10px;" onclick="playerWipeGame()">Reset ma sauvegarde (Saison actu)</button>
-            
-            <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin: 25px 0;">
-            <button class="btn-full" style="background:none; color:var(--neon-blue); border:1px solid var(--neon-blue); padding:10px;" onclick="switchTab('network', document.getElementById('tab-network-btn'))">Voir règles de saison 📅</button>
-            <button class="btn-full bg-red" onclick="logoutUser()">Se déconnecter</button>
-            <button class="btn-full bg-gray" style="font-size: 11px; margin-top:15px;" onclick="openAdminLogin()">🔒 Accès Admin</button>
-            <button class="btn-full bg-gray" onclick="closeModal('player-settings-modal')">Fermer</button>
+            <button class="btn-full" style="background: linear-gradient(90deg, #ffd700, #ff8c00); color: black;" onclick="buyVIP()">👑 Devenir VIP (Paypal)</button>
+            <button class="btn-full" style="background:rgba(255,0,60,0.2); color:var(--neon-red);" onclick="wipeSave()">⚠️ Effacer la sauvegarde</button>
+            <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white; margin-top:20px;" onclick="openAdminLogin()">🔒 Accès Admin</button>
+            <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white;" onclick="closeModal('player-settings-modal')">Fermer</button>
         </div>
     </div>
 
-    <!-- BUST CHOICE MODAL -->
+    <!-- BUST CHOICE MODAL (TRAP) -->
     <div id="bust-modal" class="modal">
         <div class="modal-content">
-            <div class="bust-title">🚨 PERQUISITION 🚨</div>
-            <div id="bust-desc" style="font-size: 14px; margin-bottom: 20px; line-height: 1.5; color: white; font-weight: 600;"></div>
-            <button class="btn-full bg-green" onclick="acceptDebtChoice()">Accepter la dette (30m)</button>
-            <button class="btn-full bg-red" onclick="refuseDebtChoice()">Refuser (Guerre de Gangs)</button>
+            <h3 style="color:var(--neon-red); text-align:center;">🚨 PERQUISITION 🚨</h3>
+            <p style="font-size: 13px; color: white; text-align:center; margin-bottom: 20px;">Tu es tombé dans un piège de l'indic. La came appartenait au grand. Tu as 30 minutes pour le rembourser.</p>
+            <button class="btn-full" style="background:var(--neon-green); color:black;" onclick="acceptDebtChoice()">Accepter la dette</button>
         </div>
     </div>
 
@@ -417,61 +292,34 @@
     <div id="login-modal" class="modal">
         <div class="modal-content">
             <h3>God Mode</h3>
-            <input type="text" id="admin-id" placeholder="ID" class="modal-input">
             <input type="password" id="admin-pass" placeholder="Mot de passe" class="modal-input">
-            <p id="error-msg" style="color:var(--neon-red); font-size:11px; font-weight:700; text-align:center; display:none;">Identifiants invalides.</p>
-            <button class="btn-full bg-purple" onclick="verifyAdmin()">Se connecter</button>
-            <button class="btn-full bg-gray" onclick="closeModal('login-modal')">Annuler</button>
+            <button class="btn-full" style="background:var(--neon-purple); color:white;" onclick="verifyAdmin()">Connexion</button>
+            <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white;" onclick="closeModal('login-modal')">Annuler</button>
         </div>
     </div>
 
     <!-- ADMIN PANEL -->
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <h3 style="color: var(--neon-green);">Réseau SYS</h3>
-            
-            <button class="btn-full" style="background:#444; color: white;" onclick="adminListUsers()">Lister Utilisateurs Inscrits</button>
-            
-            <label style="font-size: 11px; font-weight:800; color: var(--text-muted); letter-spacing:1px; margin-top:20px; display:block;">INJECTER CASH ($)</label>
-            <input type="number" id="add-cash-input" placeholder="Montant">
-            <button class="btn-full" style="background:var(--neon-gold); color:black;" onclick="adminAddCash()">+ Ajouter</button>
-            
-            <label style="font-size: 11px; font-weight:800; color: var(--text-muted); margin-top:15px; display:block;">GÉNÉRER UN MESSAGE</label>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:8px;">
-                <button class="btn-full bg-gray" onclick="adminForceEvent('e1')">Client</button>
-                <button class="btn-full bg-gray" onclick="adminForceEvent('e3')">Police</button>
-                <button class="btn-full bg-gray" onclick="adminForceEvent('e7')">🐀 Piège</button>
-                <button class="btn-full bg-gray" onclick="adminForceEvent('e5')">🥷 Gang</button>
+            <h3 style="color: var(--neon-green);">Panel Admin</h3>
+            <button class="btn-full" style="background:var(--neon-gold); color:black;" onclick="game.cash+=10000; updateUI(); saveGame(); showToast('+10k$', 'var(--neon-gold)')">+ Ajouter 10k $</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:15px;">
+                <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white; margin:0;" onclick="adminForceEvent('e1')">Client</button>
+                <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white; margin:0;" onclick="adminForceEvent('e7')">🐀 Piège</button>
+                <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white; margin:0;" onclick="adminForceEvent('e3')">🚓 Flic</button>
+                <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white; margin:0;" onclick="adminForceEvent('e5')">🥷 Gang</button>
             </div>
-
-            <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin: 25px 0;">
-            <button class="btn-full bg-purple" id="btn-autoclick" onclick="toggleAdminAutoClick()">⚡ Auto-Clicker</button>
-            <button class="btn-full bg-gray" style="margin-top:10px;" onclick="closeModal('settings-modal')">Fermer</button>
-        </div>
-    </div>
-
-    <!-- ADMIN USER LIST (EXTENSION) -->
-    <div id="admin-users-modal" class="modal">
-        <div class="modal-content">
-            <h3>Base de données</h3>
-            <p style="font-size:10px; color:var(--text-muted);">Liste des identifiants inscrits en local.</p>
-            <div id="admin-users-list" style="max-height: 50vh; overflow-y:auto; border: 1px solid rgba(255,255,255,0.1); border-radius:12px; margin: 15px 0;">
-                <!-- User list -->
-            </div>
-            <button class="btn-full bg-gray" onclick="closeModal('admin-users-modal'); openModal('settings-modal')">Fermer</button>
+            <button class="btn-full" style="background:var(--neon-purple); color:white; margin-top:15px;" onclick="adminAutoClickerOn=!adminAutoClickerOn; showToast('Auto-click: '+adminAutoClickerOn, 'var(--neon-purple)')">⚡ Toggle Auto-Clicker</button>
+            <button class="btn-full" style="background:rgba(255,255,255,0.1); color:white; margin-top:15px;" onclick="closeModal('settings-modal')">Fermer</button>
         </div>
     </div>
 
     <script>
-        // INIT TELEGRAM & AUTH CHECK
-        let userName = "Anonyme";
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
-            window.Telegram.WebApp.setHeaderColor('#0a0a0c');
-            try { userName = window.Telegram.WebApp.initDataUnsafe.user.first_name; } catch(e) {}
+            window.Telegram.WebApp.setHeaderColor('#050507');
         }
-        document.getElementById('header-user-name').innerText = userName;
 
         // --- DATABASE ---
         const GROW_ITEMS = [
@@ -483,397 +331,309 @@
         const SELL_ITEMS = [
             { id: 'pochon', name: 'Ziploc', cost: 250, rate: 1, type: 'click', icon: '🛍️', desc: 'Manuel : +1g/clic', maxLevel: 50 },
             { id: 'balance', name: 'Balance Précise', cost: 3500, rate: 3, type: 'click', icon: '⚖️', desc: 'Manuel : +3g/clic', maxLevel: 50 },
-            { id: 'tel', name: 'Tel Crypté', cost: 12000, rate: 8, type: 'click', icon: '📱', desc: 'Manuel : +8g/clic', maxLevel: 25 },
             { id: 'guetteur', name: 'Guetteur', cost: 800, rate: 0.2, type: 'auto', icon: '👀', desc: 'Auto : 0.2 g/s', maxLevel: 100 },
-            { id: 'dealer', name: 'Dealer', cost: 4500, rate: 1.2, type: 'auto', icon: '🚲', desc: 'Auto : 1.2 g/s', maxLevel: 50 },
-            { id: 'four', name: 'Point de Deal', cost: 25000, rate: 6, type: 'auto', icon: '🔥', desc: 'Auto : 6 g/s', maxLevel: 25 }
+            { id: 'dealer', name: 'Dealer', cost: 4500, rate: 1.2, type: 'auto', icon: '🚲', desc: 'Auto : 1.2 g/s', maxLevel: 50 }
         ];
-        
         const NETWORK_ITEMS = [
-            { id: 'chimiste', name: 'El Chemisto', baseCostRep: 10, bonusType: 'grow', icon: '👨‍🔬', desc: 'Prod. +50% / lvl', maxLevel: 10 },
-            { id: 'comptable', name: 'Le Blanchisseur', baseCostRep: 15, bonusType: 'heat', icon: '📊', desc: 'Police ralentie 20%/lvl', maxLevel: 10 },
-            { id: 'avocat', name: 'Saul', baseCostRep: 30, bonusType: 'price', icon: '💼', desc: 'Prix de vente +30%/lvl', maxLevel: 10 },
-            { id: 'corrompu', name: 'Inspecteur B.', baseCostRep: 50, bonusType: 'bribe', icon: '🕵️', desc: 'Pot-de-vin -30%/lvl', maxLevel: 5 },
-            { id: 'parrain', name: 'El Patron', baseCostRep: 150, bonusType: 'grow', icon: '🕴️', desc: 'Prod. +100%/lvl', maxLevel: 5 },
-            { id: 'cartel', name: 'Contact Cartel', baseCostRep: 400, bonusType: 'price', icon: '✈️', desc: 'Prix de vente +100%/lvl', maxLevel: 5 }
+            { id: 'chimiste', name: 'El Chemisto', baseCostRep: 10, icon: '👨‍🔬', desc: 'Prod. +50% / lvl', maxLevel: 10 },
+            { id: 'comptable', name: 'Le Blanchisseur', baseCostRep: 15, icon: '📊', desc: 'Police ralentie 20%/lvl', maxLevel: 10 },
+            { id: 'avocat', name: 'Saul', baseCostRep: 30, icon: '💼', desc: 'Prix de vente +30%/lvl', maxLevel: 10 }
         ];
         const EVENT_TEMPLATES = [
-            { id: 'e1', sender: '🏃‍♂️ Client Pressé', initText: "Gros, il me faut 15g en urgence pour une soirée. Je te file 100$ direct.", reqWeed: 15, reqCash: 0, rewardCash: 100, rewardRep: 1, negWeed: 15, negCash: 150 },
-            { id: 'e2', sender: '🤝 Grossiste', initText: "J'ai besoin de 100g pour ravitailler ma zone. Paiement de 500$.", reqWeed: 100, reqCash: 0, rewardCash: 500, rewardRep: 3, negWeed: 100, negCash: 750 },
-            { id: 'e3', sender: '🚓 Flic Corrompu', initText: "Descente imminente. Donne moi 1500$ et on vous oublie. Sinon je saisis.", reqWeed: 0, reqCash: 1500, rewardCash: 0, rewardRep: 0, isThreat: true },
-            { id: 'e4', sender: '🕵️ L\'informateur', initText: "File moi 50g, j'ai des infos pour te faire monter dans l'estime des boss.", reqWeed: 50, reqCash: 0, rewardCash: 0, rewardRep: 5, negWeed: 30, negCash: 0 },
-            { id: 'e5', sender: '🥷 Gang Rival', initText: "Paye la taxe (800$) ou mes gars viennent vider tes stocks.", reqWeed: 0, reqCash: 800, rewardCash: 0, rewardRep: 0, isThreat: true, negWeed: 0, negCash: 400 },
-            { id: 'e6', sender: '💊 Tox', initText: "Dépanne moi 5g stp, je dirai que t'es un bon !", reqWeed: 5, reqCash: 0, rewardCash: 0, rewardRep: 1 },
-            { id: 'e7', sender: '🐀 Vieux Pote', initText: "Eh mon reuf, y'a un gros coup à faire... 👮‍♂️ Ramène 20g, le mec paye 2000$.", reqWeed: 20, reqCash: 0, rewardCash: 0, rewardRep: 0, isTrap: true }
+            { id: 'e1', sender: '🏃‍♂️ Client Pressé', initText: "Il me faut 15g en urgence. 100$ direct.", reqWeed: 15, reqCash: 0, rewardCash: 100, rewardRep: 1 },
+            { id: 'e2', sender: '🤝 Grossiste', initText: "J'ai besoin de 100g. Paiement de 500$.", reqWeed: 100, reqCash: 0, rewardCash: 500, rewardRep: 3 },
+            { id: 'e3', sender: '🚓 Flic Corrompu', initText: "Descente imminente. Donne moi 1500$. Sinon je saisis.", reqWeed: 0, reqCash: 1500, rewardCash: 0, rewardRep: 0, isThreat: true },
+            { id: 'e5', sender: '🥷 Gang Rival', initText: "Paye la taxe (800$) ou on vient vider tes stocks.", reqWeed: 0, reqCash: 800, rewardCash: 0, rewardRep: 0, isThreat: true },
+            { id: 'e7', sender: '🐀 Vieux Pote', initText: "Gros coup... 👮‍♂️ Ramène 20g, le mec paye 2000$.", reqWeed: 20, reqCash: 0, rewardCash: 0, rewardRep: 0, isTrap: true }
         ];
 
-        let MUSIC_TRACKS = [
-            { name: "🎶 Jul Style - Instru", url: "https://cdn.pixabay.com/audio/2022/12/28/audio_6b5c03c518.mp3" },
-            { name: "🎶 Rap FR Sombre", url: "https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" },
-            { name: "🎶 Hugo TSR Vibe", url: "https://cdn.pixabay.com/audio/2022/10/18/audio_31c2730e64.mp3" },
-            { name: "🎶 Guizmo Type Beat", url: "https://cdn.pixabay.com/audio/2023/02/28/audio_55d4918e3d.mp3" }
-        ];
-
-        const NEGO_DIALOGS = {
-            agressif: { chance: 0.35, me: ["C'est mon prix, casse pas la tête.", "Prends ou dégage.", "Fais pas la pince Allonge."], win: ["Calme-toi gros, ok.", "Ok ok, prends l'argent."], lose: ["Parle bien, garde ta came.", "T'es trop fou, ciao."] },
-            commercial: { chance: 0.65, me: ["Frérot, la frappe se paye. Effort.", "Tu trouveras pas mieux.", "Faut rallonger, c'est du top."], win: ["C'est vrai qu'elle tape... vas-y.", "Marché conclu."], lose: ["Trop cher pour moi.", "Je bouge salut."] },
-            bluff: { chance: 0.50, me: ["J'ai un autre client qui attend.", "Dépêche, j'ai 10 appels pour ça.", "Si tu prends pas, le prochain le fera."], win: ["Putain ok, je m'aligne.", "Ok je prends, la donne pas !"], lose: ["Bah vends-lui alors, mytho.", "m'en fous, salut."] }
-        };
-
-        // --- GLOBAL VARIABLES ---
-        const SEASON_DURATION = 10 * 24 * 60 * 60 * 1000; // 10 days
-        const GAME_LAUNCH_TIME = 1716307200000; // 21 May 2024 (Fictional start date)
-
-        // --- STATE ---
-        // Added dryingWeed and dryingTimer to state
-        let game = { weed: 0, dryingWeed: 0, dryingTimer: 30, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 };
+        let MUSIC_TRACKS = [{ name: "🎶 Rap Instru", url: "https://cdn.pixabay.com/audio/2022/12/28/audio_6b5c03c518.mp3" }];
+        
+        // STATE
+        let game = { weed: 0, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, isVIP: false };
         let currentGps = 0; let currentSps = 0; let currentPrice = 3.5; let clickGpc = 1; let clickSpc = 1;
-        let adminAutoClickerOn = false; let gangBonusDeadline = 0; let vipBonusDeadline = 0;
-        let currentTrackIdx = 0; let isMusicPlaying = false; let currentOpenChatUid = null;
-        let currentAuthUser = null;
+        let adminAutoClickerOn = false; let currentTrackIdx = 0; let isMusicPlaying = false; let currentOpenChatUid = null;
 
-        // --- AUTH SYSTEM (LOCAL SIMULATION) ---
-        function getAccounts() { return JSON.parse(localStorage.getItem('cartel_accounts') || '{}'); }
-        function saveAccount(id, psw) { const a = getAccounts(); a[id] = psw; localStorage.setItem('cartel_accounts', JSON.stringify(a)); }
-
-        function checkAuth() {
-            const storedUser = localStorage.getItem('cartel_logged_user');
-            if(storedUser) {
-                currentAuthUser = storedUser;
-                document.getElementById('header-user-name').innerText = currentAuthUser;
-                document.getElementById('auth-screen').style.display = 'none';
-                loadSave(); renderShops(); calcStats(); updateUI(); renderEventsList();
-                startSeasonTimer();
-            } else {
-                document.getElementById('auth-screen').style.display = 'flex';
-            }
-        }
-
-        function loginUser() {
-            const u = document.getElementById('auth-username').value.trim();
-            const p = document.getElementById('auth-password').value;
-            const a = getAccounts();
-            if(!u || !p) { showAuthError("Remplis les champs."); return; }
-            if(a[u] && a[u] === p) {
-                completeLogin(u);
-            } else { showAuthError("Pseudo ou mdp incorrect."); }
-        }
-
-        function registerUser() {
-            const u = document.getElementById('auth-username').value.trim();
-            const p = document.getElementById('auth-password').value;
-            const a = getAccounts();
-            if(!u || u.length < 3 || !p || p.length < 4) { showAuthError("Pseudo (min 3) ou mdp (min 4) trop court."); return; }
-            if(a[u]) { showAuthError("Ce pseudo existe déjà."); } else {
-                saveAccount(u, p);
-                completeLogin(u);
-            }
-        }
-
-        function completeLogin(u) {
-            currentAuthUser = u;
-            localStorage.setItem('cartel_logged_user', u);
-            document.getElementById('auth-error').style.display = 'none';
-            checkAuth(); // This hides auth screen and loads data
-        }
-
-        function logoutUser() {
-            game = { weed: 0, dryingWeed: 0, dryingTimer: 30, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 }; // Clear temp game
-            localStorage.removeItem('cartel_logged_user');
-            closeModal('player-settings-modal');
-            location.reload(); // Hard reload to auth screen
-        }
-
-        function showAuthError(txt) { const e = document.getElementById('auth-error'); e.innerText = txt; e.style.display = 'block'; }
-
-        // --- ENGINE ---
-        function showToast(text, colorHex) {
-            const t = document.createElement('div'); t.className = 'toast'; t.innerText = text;
-            t.style.border = `1px solid ${colorHex}`; t.style.color = colorHex; t.style.boxShadow = `0 0 15px ${colorHex}40`;
-            document.body.appendChild(t);
-            setTimeout(() => { t.style.opacity = '0'; t.style.transition = '0.3s'; setTimeout(()=>t.remove(), 300); }, 3500);
-        }
-
-        function loadSave() {
-            if(!currentAuthUser) return;
-            // The save is unique per username
-            const saveKey = 'cartel_save_' + currentAuthUser;
-            const save = localStorage.getItem(saveKey);
+        // --- CORE FUNCTIONS ---
+        function initGame() {
+            const save = localStorage.getItem('cartel_tycoon_save');
             if (save) { 
-                let parsed = JSON.parse(save);
-                game = { ...game, ...parsed }; 
-                game.activeEvents.forEach(ev => { if(!ev.history) { ev.history = [{ sender: 'them', text: ev.initText || ev.text }]; } });
-                
-                // Ensure drying properties exist for old saves
-                if (game.dryingWeed === undefined) game.dryingWeed = 0;
-                if (game.dryingTimer === undefined || isNaN(game.dryingTimer)) game.dryingTimer = 30;
+                game = { ...game, ...JSON.parse(save) }; 
+                // Ensure arrays are proper
+                if(!Array.isArray(game.activeEvents)) game.activeEvents = [];
+                game.activeEvents.forEach(e => { if(!e.history) e.history = [{sender: 'them', text: e.initText}]; });
             } else {
-                // Initialize default save for new user
-                game = { weed: 0, dryingWeed: 0, dryingTimer: 30, cash: 0, rep: 0, heat: 0, inventory: {}, activeEvents: [], debt: 0, debtDeadline: 0, pendingDebt: 0, gangTrackerDeadline: 0, vigileDeadline: 0, sellTransactionCount: 0, lastThreatTime: 0, lastTrapTime: 0, isVIP: false, lastVIPReward: "", lastSeasonPlayed: 0 };
                 [...GROW_ITEMS, ...SELL_ITEMS, ...NETWORK_ITEMS].forEach(i => game.inventory[i.id] = 0);
             }
-            checkSeasonReset();
+            renderShops(); calcStats(); updateUI(); renderEventsList();
         }
-
-        function saveGame() { if(!currentAuthUser) return; const saveKey = 'cartel_save_' + currentAuthUser; localStorage.setItem(saveKey, JSON.stringify(game)); }
-        function getCost(baseCost, count) { return Math.floor(baseCost * Math.pow(1.35, count)); } 
-        function getRepCost(baseCost, count) { return Math.floor(baseCost * Math.pow(1.5, count)); } 
+        function saveGame() { localStorage.setItem('cartel_tycoon_save', JSON.stringify(game)); }
+        function wipeSave() { if(confirm('T\'es sûr ? Tout sera perdu.')) { localStorage.removeItem('cartel_tycoon_save'); location.reload(); } }
+        
+        function formatVal(n) { if (n < 1000) return Math.floor(n); if (n < 1000000) return (n/1000).toFixed(1) + 'k'; return (n/1000000).toFixed(1) + 'M'; }
+        function showToast(text, color) {
+            const t = document.createElement('div'); t.className = 'toast'; t.innerText = text;
+            t.style.border = `1px solid ${color}`; t.style.color = color; t.style.boxShadow = `0 0 15px ${color}40`;
+            document.body.appendChild(t); setTimeout(() => { t.style.opacity = '0'; t.style.transition = '0.3s'; setTimeout(()=>t.remove(), 300); }, 3000);
+        }
 
         function calcStats() {
             let baseGps = 0; GROW_ITEMS.forEach(i => baseGps += game.inventory[i.id] * i.rate);
-            let growMult = 1;
-            if (game.inventory['chimiste']) growMult += (0.5 * game.inventory['chimiste']);
-            if (game.inventory['parrain']) growMult += (1.0 * game.inventory['parrain']);
+            let growMult = 1 + (0.5 * (game.inventory['chimiste'] || 0));
             currentGps = baseGps * growMult; clickGpc = (1 + (baseGps * 0.02)) * growMult; 
 
             let baseSps = 0; clickSpc = 1;
             SELL_ITEMS.forEach(i => { if(i.type === 'auto') baseSps += game.inventory[i.id] * i.rate; if(i.type === 'click') clickSpc += 1 + i.rate; });
             currentSps = baseSps;
 
-            let priceMult = 1;
-            if (game.inventory['avocat']) priceMult += (0.3 * game.inventory['avocat']);
-            if (game.inventory['cartel']) priceMult += (1.0 * game.inventory['cartel']);
-            
-            if (gangBonusDeadline > Date.now()) { priceMult *= 2.0; document.getElementById('ui-price').style.color = "var(--neon-green)";
-            } else if (vipBonusDeadline > Date.now()) { priceMult *= 1.35; document.getElementById('ui-price').style.color = "#ffd700";
-            } else { document.getElementById('ui-price').style.color = "var(--neon-gold)"; }
-            
-            currentPrice = 3.5 * priceMult; document.getElementById('ui-price').innerText = currentPrice.toFixed(1);
-        }
-
-        function getBribeCost() {
-            let cost = Math.floor(100 + (game.cash * 0.1) + (game.heat * 10)); 
-            if(game.inventory['corrompu']) cost = Math.floor(cost * Math.pow(0.7, game.inventory['corrompu']));
-            return cost;
+            currentPrice = 3.5 * (1 + (0.3 * (game.inventory['avocat'] || 0))) * (game.isVIP ? 1.35 : 1);
         }
 
         function updateUI() {
             document.getElementById('ui-weed').innerText = formatVal(game.weed) + ' g';
             document.getElementById('ui-cash').innerText = formatVal(game.cash) + ' $';
             document.getElementById('ui-rep').innerText = formatVal(game.rep) + ' 👑';
-            document.getElementById('header-vip-tag').style.display = game.isVIP ? 'inline-block' : 'none';
             document.getElementById('ui-heat').innerText = Math.floor(game.heat) + '%';
-            if (game.heat > 80) document.getElementById('ui-heat').style.color = "var(--neon-red)";
-            else if (game.heat > 50) document.getElementById('ui-heat').style.color = "var(--neon-gold)";
-            else document.getElementById('ui-heat').style.color = "white";
-            if (game.rep > 0) document.getElementById('rep-badge').style.display = "flex";
+            document.getElementById('ui-heat').style.color = game.heat > 80 ? "var(--neon-red)" : (game.heat > 50 ? "var(--neon-gold)" : "white");
+            document.getElementById('header-vip-tag').style.display = game.isVIP ? 'inline-block' : 'none';
+            if (game.rep > 0) document.getElementById('rep-badge').style.display = "block";
+            
             document.getElementById('ui-gps').innerText = formatVal(currentGps);
             document.getElementById('ui-sps').innerText = formatVal(currentSps);
-            document.getElementById('bribe-cost').innerText = formatVal(getBribeCost());
-            document.getElementById('btn-buy-vigile').disabled = game.cash < 2000;
+            document.getElementById('ui-price').innerText = currentPrice.toFixed(1);
             
-            // Updating Drying UI
-            document.getElementById('ui-drying-amt').innerText = formatVal(game.dryingWeed) + ' g';
-            document.getElementById('ui-drying-time').innerText = Math.ceil(game.dryingTimer) + 's';
-            let progress = ((30 - game.dryingTimer) / 30) * 100;
-            document.getElementById('ui-drying-bar').style.width = Math.max(0, Math.min(100, progress)) + '%';
+            let bribeCost = Math.floor(100 + (game.cash * 0.1) + (game.heat * 10)) * Math.pow(0.7, game.inventory['comptable']||0);
+            document.getElementById('bribe-cost').innerText = formatVal(bribeCost);
+            
+            // Debt banner
+            if (game.debt > 0 && game.debtDeadline > Date.now()) {
+                document.getElementById('banner-debt').style.display = 'flex';
+                document.getElementById('banner-debt-amount').innerText = game.debt;
+                let mins = Math.floor((game.debtDeadline - Date.now()) / 60000);
+                document.getElementById('banner-debt-timer').innerText = mins + 'm';
+            } else { document.getElementById('banner-debt').style.display = 'none'; }
+            
+            // Vigile banner
+            if (game.vigileDeadline > Date.now()) {
+                document.getElementById('banner-vigile').style.display = 'flex';
+                let mins = Math.floor((game.vigileDeadline - Date.now()) / 60000);
+                document.getElementById('banner-vigile-timer').innerText = mins + 'm';
+            } else { document.getElementById('banner-vigile').style.display = 'none'; }
         }
 
-        // --- FORMAT ---
-        function formatVal(n) {
-            if (n < 1000) return Math.floor(n);
-            if (n < 1000000) return (n/1000).toFixed(1) + 'k';
-            if (n < 1000000000) return (n/1000000).toFixed(1) + 'M';
-            return (n/1000000000).toFixed(2) + 'B';
-        }
-
-        // --- RENDER LISTS ---
-        function renderShops() {
-            const createCard = (i, type, colorHex, btnClass, onclickStr, costTxt) => `
-                <div class="card" style="border-left-color: ${colorHex};">
-                    <div class="card-icon" style="color:${colorHex}; box-shadow: inset 0 0 10px ${colorHex}40;">${i.icon}</div>
-                    <div class="card-info">
-                        <h4>${i.name} <span style="color:${colorHex}; font-size:11px; font-weight:900;">lvl <span id="count-${i.id}">0/${i.maxLevel}</span></span></h4>
-                        <p>${i.desc}</p>
-                    </div>
-                    <button class="card-buy ${btnClass}" id="buy-${i.id}" onclick="${onclickStr}">${costTxt}</button>
-                </div>`;
-            document.getElementById('grow-shop').innerHTML = GROW_ITEMS.map(i => createCard(i, 'grow', 'var(--neon-green)', 'btn-buy-grow', `buyItem('${i.id}', 'grow')`, '0 $')).join('');
-            document.getElementById('sell-shop').innerHTML = SELL_ITEMS.map(i => createCard(i, 'sell', 'var(--neon-gold)', 'btn-buy-sell', `buyItem('${i.id}', 'sell')`, '0 $')).join('');
-            document.getElementById('network-shop').innerHTML = NETWORK_ITEMS.map(i => createCard(i, 'net', 'var(--neon-blue)', 'btn-buy-net', `buyContact('${i.id}')`, '0 👑')).join('');
-        }
-
-        // --- SEASON SYSTEM (RESET) ---
-        function checkSeasonReset() {
-            const now = Date.now();
-            // Calculate which 10-day season we are currently in since launch
-            const currentGlobalSeason = Math.floor((now - GAME_LAUNCH_TIME) / SEASON_DURATION);
-            
-            if (game.lastSeasonPlayed === undefined) game.lastSeasonPlayed = currentGlobalSeason;
-            
-            // If the player's save is from an older season, trigger RESET
-            if (game.lastSeasonPlayed < currentGlobalSeason) {
-                game.lastSeasonPlayed = currentGlobalSeason;
-                game.weed = 0; game.dryingWeed = 0; game.cash = 0; game.heat = 0; game.debt = 0;
-                game.debtDeadline = 0; game.pendingDebt = 0; game.gangTrackerDeadline = 0; game.sellTransactionCount = 0;
-                game.activeEvents = [];
-                // Reset standard inventory, but KEEP VIP Levels
-                [...GROW_ITEMS, ...SELL_ITEMS].forEach(i => game.inventory[i.id] = 0);
-                saveGame();
-                showToast("📅 RESET SAISONNIER EFFECTUÉ. Le terrain est nettoyé. Ton Respect (VIP) a été conservé.", "var(--neon-purple)");
-                calcStats(); updateUI(); renderShops(); renderEventsList();
-            }
-        }
-
-        function startSeasonTimer() {
-            const now = Date.now();
-            const timeInSaison = (now - GAME_LAUNCH_TIME) % SEASON_DURATION;
-            const timeLeft = SEASON_DURATION - timeInSaison;
-            
-            const days = Math.floor(timeLeft / (1000*60*60*24));
-            const hours = Math.floor((timeLeft % (1000*60*60*24)) / (1000*60*60));
-            const mins = Math.floor((timeLeft % (1000*60*60)) / (1000*60));
-            
-            document.getElementById('ui-season-timer').innerText = `${days}j ${hours}h ${mins}m`;
-            setTimeout(startSeasonTimer, 60000); // Update every minute
-        }
-
-        // --- INTERACTION ---
-        function spawnAnim(x, y, text, colorHex) {
-            const p = document.createElement('div'); p.className = 'particle'; p.innerText = text; p.style.color = colorHex; p.style.left = x + 'px'; p.style.top = y + 'px';
+        function spawnAnim(x, y, text, color) {
+            const p = document.createElement('div'); p.className = 'particle'; p.innerText = text; p.style.color = color; p.style.left = x + 'px'; p.style.top = y + 'px';
             document.body.appendChild(p); setTimeout(()=>p.remove(), 1000);
         }
         
-        // Modification: Clicking now adds to dryingWeed
+        // Direct harvest - NO DRYING
         document.getElementById('btn-grow').addEventListener('pointerdown', (e) => {
-            game.dryingWeed += clickGpc; 
-            spawnAnim(e.clientX, e.clientY, '+'+formatVal(clickGpc)+'g', 'var(--neon-green)'); 
-            updateUI();
+            game.weed += clickGpc; spawnAnim(e.clientX, e.clientY, '+'+formatVal(clickGpc)+'g', 'var(--neon-green)'); updateUI();
         });
-        
         document.getElementById('btn-sell').addEventListener('pointerdown', (e) => {
-            let qtyToSell = Math.min(game.weed, clickSpc);
-            if(qtyToSell >= 1) {
-                game.weed -= qtyToSell; let rev = qtyToSell * currentPrice; game.cash += rev;
+            let qty = Math.min(game.weed, clickSpc);
+            if(qty >= 1) {
+                game.weed -= qty; let rev = qty * currentPrice; game.cash += rev;
                 game.sellTransactionCount += 1;
                 spawnAnim(e.clientX, e.clientY, '+'+formatVal(rev)+'$', 'var(--neon-gold)'); updateUI();
             } else { spawnAnim(e.clientX, e.clientY, 'Rupture', 'var(--neon-red)'); }
         });
 
-        function buyItem(id, type) {
-            const itemList = type === 'grow' ? GROW_ITEMS : SELL_ITEMS;
-            const item = itemList.find(i => i.id === id);
-            if(game.inventory[id] >= item.maxLevel) return;
-            const cost = getCost(item.cost, game.inventory[id]);
-            if (game.cash >= cost) {
-                game.cash -= cost; game.inventory[id]++; calcStats(); updateUI(); saveGame();
-            } else { showToast("⚠️ Fonds insuffisants !", "var(--neon-red)"); }
-        }
-        function buyContact(id) {
-            const item = NETWORK_ITEMS.find(i => i.id === id);
-            if(game.inventory[id] >= item.maxLevel) return;
-            let cost = getRepCost(item.baseCostRep, game.inventory[id]);
-            if (game.rep >= cost) {
-                game.rep -= cost; game.inventory[id]++; calcStats(); updateUI(); saveGame();
-            } else { showToast("⚠️ Pas assez de Respect (👑) !", "var(--neon-red)"); }
-        }
-        function bribePolice() {
-            let cost = getBribeCost();
-            if(game.cash >= cost && game.heat > 0) { game.cash -= cost; game.heat = 0; updateUI(); saveGame(); showToast("Dette effacée. Heat à 0%.", "var(--neon-blue)");
-            } else if (game.cash < cost) { showToast("⚠️ Fonds insuffisants !", "var(--neon-red)"); }
+        function renderShops() {
+            const makeCard = (i, type, color, btnC) => `
+                <div class="card" style="border-left-color:${color};">
+                    <div class="card-icon" style="color:${color};">${i.icon}</div>
+                    <div class="card-info"><h4>${i.name} <span style="color:${color}; font-size:10px;">lvl ${game.inventory[i.id]}/${i.maxLevel}</span></h4><p>${i.desc}</p></div>
+                    <button class="card-buy" style="background:rgba(255,255,255,0.1); color:${color}; border:1px solid ${color}40;" onclick="buyItem('${i.id}', '${type}')">Acheter</button>
+                </div>`;
+            document.getElementById('grow-shop').innerHTML = GROW_ITEMS.map(i => makeCard(i, 'grow', 'var(--neon-green)')).join('');
+            document.getElementById('sell-shop').innerHTML = SELL_ITEMS.map(i => makeCard(i, 'sell', 'var(--neon-gold)')).join('');
+            document.getElementById('network-shop').innerHTML = NETWORK_ITEMS.map(i => makeCard(i, 'net', 'var(--neon-blue)')).join('');
         }
 
-        // --- EVENTS (PHONE) ---
+        function buyItem(id, type) {
+            const list = type === 'grow' ? GROW_ITEMS : (type === 'sell' ? SELL_ITEMS : NETWORK_ITEMS);
+            const item = list.find(i => i.id === id);
+            if(game.inventory[id] >= item.maxLevel) return;
+            const cost = type === 'net' ? Math.floor(item.baseCostRep * Math.pow(1.5, game.inventory[id])) : Math.floor(item.cost * Math.pow(1.35, game.inventory[id]));
+            
+            if (type === 'net') {
+                if(game.rep >= cost) { game.rep -= cost; game.inventory[id]++; } else { showToast("⚠️ Respect insuffisant (👑) !", "var(--neon-red)"); return; }
+            } else {
+                if(game.cash >= cost) { game.cash -= cost; game.inventory[id]++; } else { showToast("⚠️ Fonds insuffisants !", "var(--neon-red)"); return; }
+            }
+            calcStats(); updateUI(); renderShops(); saveGame();
+        }
+
+        function bribePolice() {
+            let cost = Math.floor(100 + (game.cash * 0.1) + (game.heat * 10)) * Math.pow(0.7, game.inventory['comptable']||0);
+            if(game.cash >= cost && game.heat > 0) { game.cash -= cost; game.heat = 0; updateUI(); saveGame(); showToast("Heat à 0%.", "var(--neon-blue)"); }
+        }
+        function buyVigile() { if(game.cash>=2000) { game.cash-=2000; game.vigileDeadline = Date.now() + (15*60000); updateUI(); } }
+        function payDebt() { if(game.cash >= game.debt) { game.cash -= game.debt; game.debt = 0; updateUI(); showToast("Dette payée.", "var(--neon-green)"); } }
+
         function generateEvent() {
-            if (Math.random() < 0.2 && game.activeEvents.length < 5 && (game.cash > 50 || game.weed > 20 || game.rep > 0)) {
-                let templates = EVENT_TEMPLATES;
-                game.activeEvents.unshift({ ...templates[Math.floor(Math.random() * templates.length)], uid: Date.now(), read: false, history: [{ sender: 'them', text: templates[Math.floor(Math.random() * templates.length)].initText }] });
+            if (Math.random() < 0.25 && game.activeEvents.length < 5 && (game.cash > 50 || game.weed > 20)) {
+                let tpl = EVENT_TEMPLATES[Math.floor(Math.random() * EVENT_TEMPLATES.length)];
+                game.activeEvents.unshift({ ...tpl, uid: Date.now(), read: false, history: [{ sender: 'them', text: tpl.initText }] });
                 if(document.getElementById('view-phone').classList.contains('active')) renderEventsList();
-                document.getElementById('notif-phone').style.display = 'block';
-                saveGame();
+                document.getElementById('notif-phone').style.display = 'block'; saveGame();
             }
         }
         function renderEventsList() {
-            const container = document.getElementById('messages-container'); const empty = document.getElementById('empty-messages');
-            const hasUnread = game.activeEvents.some(e => !e.read); document.getElementById('notif-phone').style.display = hasUnread ? 'block' : 'none';
-            if(game.activeEvents.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
-            empty.style.display = 'none';
-            container.innerHTML = game.activeEvents.map(ev => {
-                const lastMsg = ev.history[ev.history.length - 1]; const iconMatch = ev.sender.match(/^(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff])/); const icon = iconMatch ? iconMatch[0] : '👤';
-                return `<div class="chat-preview ${ev.isThreat ? 'threat' : ''}" onclick="openChat(${ev.uid})"><div class="chat-preview-icon">${icon}</div><div class="chat-preview-info"><div class="chat-preview-name">${ev.sender.replace(icon, '')}</div><div class="chat-preview-text">${lastMsg.sender === 'me' ? 'Vous: ' : ''}${lastMsg.text}</div></div>${!ev.read ? `<div class="chat-unread"></div>` : ''}</div>`}).join('');
+            const cont = document.getElementById('messages-container');
+            document.getElementById('notif-phone').style.display = game.activeEvents.some(e => !e.read) ? 'block' : 'none';
+            if(game.activeEvents.length === 0) { cont.innerHTML = ''; document.getElementById('empty-messages').style.display = 'block'; return; }
+            document.getElementById('empty-messages').style.display = 'none';
+            cont.innerHTML = game.activeEvents.map(ev => {
+                const last = ev.history[ev.history.length - 1]; const icon = ev.sender.split(' ')[0];
+                return `<div class="chat-preview ${ev.isThreat ? 'threat' : ''}" onclick="openChat(${ev.uid})"><div class="chat-preview-icon">${icon}</div><div class="chat-preview-info"><div class="chat-preview-name">${ev.sender.replace(icon, '')}</div><div class="chat-preview-text">${last.sender === 'me' ? 'Vous: ' : ''}${last.text}</div></div>${!ev.read ? `<div class="chat-unread"></div>` : ''}</div>`
+            }).join('');
         }
         function openChat(uid) {
             const ev = game.activeEvents.find(e => e.uid === uid); if(!ev) return;
             currentOpenChatUid = uid; ev.read = true; renderEventsList(); saveGame();
-            const iconMatch = ev.sender.match(/^(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff])/);
-            document.getElementById('detail-icon').innerText = iconMatch ? iconMatch[0] : '👤';
-            document.getElementById('detail-name').innerText = ev.sender.replace(iconMatch ? iconMatch[0] : '', '').trim();
-            if(ev.isThreat) document.getElementById('detail-name').style.color = "var(--neon-red)";
+            const icon = ev.sender.split(' ')[0];
+            document.getElementById('detail-icon').innerText = icon;
+            document.getElementById('detail-name').innerText = ev.sender.replace(icon, '').trim();
+            document.getElementById('detail-name').style.color = ev.isThreat ? "var(--neon-red)" : "white";
             renderChatDetail(); document.getElementById('phone-detail-view').classList.add('active');
         }
         function closeChat() { document.getElementById('phone-detail-view').classList.remove('active'); currentOpenChatUid = null; }
         
         function renderChatDetail() {
-            if(!currentOpenChatUid) return; const ev = game.activeEvents.find(e => e.uid === currentOpenChatUid); if(!ev) { closeChat(); return; }
-            document.getElementById('detail-thread').innerHTML = ev.history.map(msg => `<div class="chat-msg ${msg.sender === 'me' ? 'chat-me' : 'chat-them'}">${msg.text}</div>`).join('');
-            const threadContainer = document.getElementById('detail-thread'); threadContainer.scrollTop = threadContainer.scrollHeight;
-            let actionsHtml = `<div style="font-size:11px; color:var(--text-muted); margin-bottom:10px; font-weight:700; background:rgba(0,0,0,0.5); padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">Demande: ${ev.reqWeed>0?ev.reqWeed+'g ':''}${ev.reqCash>0?ev.reqCash+'$ ':''}<br>🎁 Gain: +${ev.rewardCash}$ +${ev.rewardRep}👑</div><div class="msg-actions">`;
-            actionsHtml += `<button class="btn-msg btn-accept" onclick="handleEvent(${ev.uid}, 'accept')">Accepter</button><button class="btn-msg btn-decline" onclick="handleEvent(${ev.uid}, 'decline')">Rejeter</button>`;
-            actionsHtml += `</div>`; document.getElementById('detail-actions').innerHTML = actionsHtml;
-        }
-        function handleEvent(uid, action) {
-            const index = game.activeEvents.findIndex(e => e.uid === uid); if(index === -1) return; const ev = game.activeEvents[index];
-            if(action === 'accept') { if(game.weed >= ev.reqWeed && game.cash >= ev.reqCash) { game.weed -= ev.reqWeed; game.cash -= ev.reqCash; game.cash += ev.rewardCash; game.rep += ev.rewardRep; game.activeEvents.splice(index, 1); closeChat(); } else { alert("Pas assez de matos/cash !"); return; }
-            } else if (action === 'decline') { game.activeEvents.splice(index, 1); closeChat(); }
-            renderEventsList(); updateUI(); saveGame();
-        }
-
-        // --- MUSIC PLAYER ---
-        function updateVolume() { const audio = document.getElementById('bg-music'); const vol = document.getElementById('music-volume').value; audio.volume = vol / 100; }
-        function loadTrack() { const audio = document.getElementById('bg-music'); const src = document.getElementById('bg-music-src'); const track = MUSIC_TRACKS[currentTrackIdx]; src.src = track.url; document.getElementById('music-track-name').innerText = track.name; audio.load(); if (isMusicPlaying) audio.play().catch(e => console.log('Autoplay bloqué', e)); }
-        function toggleMusic() { const audio = document.getElementById('bg-music'); const btn = document.getElementById('btn-play-music'); if(isMusicPlaying) { audio.pause(); btn.innerText = '▶️'; } else { if(!audio.src || audio.src === window.location.href) loadTrack(); audio.play().catch(e => console.log('Autoplay bloqué', e)); btn.innerText = '⏸'; document.getElementById('music-track-name').innerText = MUSIC_TRACKS[currentTrackIdx].name; } isMusicPlaying = !isMusicPlaying; }
-        function changeTrack(direction) { currentTrackIdx += direction; if (currentTrackIdx < 0) currentTrackIdx = MUSIC_TRACKS.length - 1; if (currentTrackIdx >= MUSIC_TRACKS.length) currentTrackIdx = 0; loadTrack(); }
-        document.getElementById('bg-music').addEventListener('ended', () => changeTrack(1));
-        function importCustomMusic(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { MUSIC_TRACKS.push({ name: "🎵 Importé - " + input.files[0].name.substring(0,10), url: e.target.result }); currentTrackIdx = MUSIC_TRACKS.length - 1; loadTrack(); toggleMusic(); showToast("Musique importée et lancée !", "var(--neon-blue)"); }; reader.readAsDataURL(input.files[0]); } }
-
-        // --- VIP SYSTEM ---
-        function buyVIP() { if(confirm("Simulation: Confirmer l'achat VIP PayPal ?")) { game.isVIP = true; saveGame(); updateUI(); showToast("👑 Félicitations ! Tu es membre VIP.", "var(--neon-gold)"); checkVIPReward(); } }
-        function checkVIPReward() {
-            if (!game.isVIP) return; const now = new Date(); const todayString = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
-            if (now.getHours() >= 18) { if (game.lastVIPReward !== todayString) { game.lastVIPReward = todayString; vipBonusDeadline = Date.now() + (5 * 60 * 1000); game.vigileDeadline = Math.max(game.vigileDeadline, Date.now() + (10 * 60 * 1000)); showToast("👑 CADEAU VIP : Prix x1.35 (5m) et Invincibilité (10m) !", "var(--neon-gold)"); calcStats(); updateUI(); saveGame(); } }
-        }
-
-        // --- ADMIN SYSTEM ---
-        function openAdminLogin() { closeModal('player-settings-modal'); setTimeout(() => openModal('login-modal'), 300); }
-        function verifyAdmin() { if(document.getElementById('admin-id').value === 'admin' && document.getElementById('admin-pass').value === 'admin316') { closeModal('login-modal'); openModal('settings-modal'); } else { alert("Identifiants invalides."); } }
-        function adminAddCash() { const v = parseInt(document.getElementById('add-cash-input').value); if(v>0) { game.cash+=v; updateUI(); saveGame(); showToast("+ Biff injecté", "var(--neon-gold)"); } }
-        function adminForceEvent(id) { const tpl = EVENT_TEMPLATES.find(t => t.id === id); if(tpl) { game.activeEvents.unshift({ ...tpl, uid: Date.now(), read: false, history: [{ sender: 'them', text: tpl.initText }] }); renderEventsList(); showToast('📩 Message forcé !', "var(--neon-green)"); } }
-        function adminListUsers() {
-            const users = getAccounts(); const container = document.getElementById('admin-users-list'); container.innerHTML = '';
-            for(let u in users) { container.innerHTML += `<div style="font-size:11px; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">ID: <b style="color:white;">${u}</b> <span style="color:var(--text-muted);"> (Mdp: ${users[u]})</span></div>`; }
-            openModal('admin-users-modal');
-        }
-
-        // --- GAME LOOP ---
-        setInterval(() => {
-            // Modification: Auto generation goes to dryingWeed
-            if (currentGps > 0) game.dryingWeed += currentGps / 10;
-            if (adminAutoClickerOn) game.dryingWeed += clickGpc * 10;
-
-            // Drying Logic
-            game.dryingTimer -= 0.1;
-            if (game.dryingTimer <= 0) {
-                if (game.dryingWeed > 0) {
-                    game.weed += game.dryingWeed;
-                    showToast(`🌿 +${formatVal(game.dryingWeed)}g prêts à la vente !`, "var(--neon-green)");
-                    game.dryingWeed = 0;
-                }
-                game.dryingTimer = 30; // Reset
+            const ev = game.activeEvents.find(e => e.uid === currentOpenChatUid); if(!ev) return;
+            document.getElementById('detail-thread').innerHTML = ev.history.map(m => `<div class="chat-msg ${m.sender === 'me' ? 'chat-me' : 'chat-them'}">${m.text}</div>`).join('');
+            const thr = document.getElementById('detail-thread'); thr.scrollTop = thr.scrollHeight;
+            
+            let acts = `<div style="font-size:11px; color:var(--text-muted); margin-bottom:10px; text-align:center;">Gain possible: +${ev.rewardCash}$ +${ev.rewardRep}👑</div><div class="msg-actions">`;
+            if (ev.isThreat || ev.isTrap) {
+                acts += `<button class="btn-msg" style="background:rgba(57,255,20,0.1); color:var(--neon-green);" onclick="handleAction('accept')">Accepter / Payer</button>
+                         <button class="btn-msg" style="background:rgba(255,0,60,0.1); color:var(--neon-red);" onclick="handleAction('decline')">Ignorer (Risqué)</button>`;
+            } else {
+                acts += `<button class="btn-msg" style="background:rgba(57,255,20,0.1); color:var(--neon-green);" onclick="handleAction('accept')">Accepter Deal</button>
+                         <button class="btn-msg" style="background:rgba(255,215,0,0.1); color:var(--neon-gold);" onclick="showNegoUI()">Négocier</button>
+                         <button class="btn-msg" style="background:rgba(255,255,255,0.1); color:white;" onclick="handleAction('decline')">Refuser</button>`;
             }
+            acts += `</div>`;
+            document.getElementById('detail-actions').innerHTML = acts;
+        }
 
-            if (currentSps > 0 && game.weed > 0) { let amount = Math.min(currentSps/10, game.weed); game.weed -= amount; game.cash += amount * currentPrice; game.sellTransactionCount += 0.1; }
-            if (game.sellTransactionCount >= 15) { let chunks = Math.floor(game.sellTransactionCount / 15); game.sellTransactionCount %= 15; if (game.vigileDeadline < Date.now()) { game.heat += chunks * 5; if (game.inventory['comptable']) game.heat *= Math.pow(0.8, game.inventory['comptable']); } }
-            updateUI();
-        }, 100);
-        setInterval(() => { saveGame(); generateEvent(); checkVIPReward(); }, 12000); 
+        function handleAction(act) {
+            const idx = game.activeEvents.findIndex(e => e.uid === currentOpenChatUid); if(idx === -1) return;
+            const ev = game.activeEvents[idx];
+            if(act === 'accept') {
+                if (ev.isTrap) { openModal('bust-modal'); }
+                else {
+                    if(game.weed >= ev.reqWeed && game.cash >= ev.reqCash) {
+                        game.weed -= ev.reqWeed; game.cash -= ev.reqCash; game.cash += ev.rewardCash; game.rep += ev.rewardRep;
+                        showToast("Transaction réussie !", "var(--neon-green)");
+                    } else { showToast("Fonds ou Matos insuffisants !", "var(--neon-red)"); return; }
+                }
+            } else if (act === 'decline') {
+                if (ev.isTrap) { game.heat += 5; showToast("T'as évité un piège (+5% Police)", "var(--neon-blue)"); }
+                else if (ev.isThreat) { triggerWanted(); }
+            }
+            game.activeEvents.splice(idx, 1); closeChat(); renderEventsList(); updateUI(); saveGame();
+        }
+
+        function triggerWanted() {
+            document.getElementById('wanted-overlay').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('wanted-overlay').classList.remove('active');
+                game.weed *= 0.8; game.cash *= 0.6;
+                showToast("Saisie ! -20% Matos, -40% Biff", "var(--neon-red)");
+                updateUI(); saveGame();
+            }, 3000);
+        }
+
+        function acceptDebtChoice() {
+            game.debt = Math.floor(Math.random() * 3000) + 2000;
+            game.debtDeadline = Date.now() + (30 * 60000);
+            closeModal('bust-modal'); game.activeEvents = game.activeEvents.filter(e => e.uid !== currentOpenChatUid);
+            closeChat(); renderEventsList(); updateUI(); saveGame();
+        }
+
+        /* Nego System */
+        function showNegoUI() {
+            document.getElementById('detail-actions').innerHTML = `
+                <div class="msg-actions">
+                    <button class="btn-msg" style="background:rgba(255,0,60,0.1); color:var(--neon-red);" onclick="attemptNego('agressif')">Agressif (Risqué)</button>
+                    <button class="btn-msg" style="background:rgba(0,243,255,0.1); color:var(--neon-blue);" onclick="attemptNego('commercial')">Commercial</button>
+                    <button class="btn-msg" style="background:rgba(255,215,0,0.1); color:var(--neon-gold);" onclick="attemptNego('bluff')">Bluff (Moyen)</button>
+                </div>`;
+        }
+        function attemptNego(type) {
+            const ev = game.activeEvents.find(e => e.uid === currentOpenChatUid); if(!ev) return;
+            const chance = type === 'agressif' ? 0.35 : (type === 'bluff' ? 0.5 : 0.65);
+            ev.history.push({sender: 'me', text: type === 'agressif' ? "Rajoute du billet ou trace ta route." : (type === 'bluff' ? "J'ai un autre acheteur à ce prix, magne toi." : "La qualité se paye mon gars, effort.")});
+            
+            if (Math.random() < chance) {
+                ev.rewardCash = Math.floor(ev.rewardCash * 1.5);
+                ev.history.push({sender: 'them', text: "Ok ok tu as gagné. Je rajoute."});
+                renderChatDetail();
+            } else {
+                ev.history.push({sender: 'them', text: "Vas te faire, je prends rien."});
+                document.getElementById('detail-thread').innerHTML = ev.history.map(m => `<div class="chat-msg ${m.sender === 'me' ? 'chat-me' : 'chat-them'}">${m.text}</div>`).join('');
+                document.getElementById('detail-actions').innerHTML = `<button class="btn-msg" style="background:rgba(255,255,255,0.1); color:white;" onclick="closeChat(); game.activeEvents = game.activeEvents.filter(e=>e.uid!==currentOpenChatUid); renderEventsList();">Fermer</button>`;
+            }
+            saveGame();
+        }
+
+        // ADMIN & VIP
+        function openAdminLogin() { closeModal('player-settings-modal'); openModal('login-modal'); }
+        function verifyAdmin() { if(document.getElementById('admin-pass').value === 'admin316') { closeModal('login-modal'); openModal('settings-modal'); } else { showToast("Faux mdp", "var(--neon-red)"); } }
+        function adminForceEvent(id) {
+            const tpl = EVENT_TEMPLATES.find(t => t.id === id); if(tpl) {
+                game.activeEvents.unshift({ ...tpl, uid: Date.now(), read: false, history: [{ sender: 'them', text: tpl.initText }] });
+                renderEventsList(); showToast('Événement généré', 'var(--neon-green)');
+            }
+        }
+        function buyVIP() { game.isVIP = true; updateUI(); showToast("👑 VIP Activé", "var(--neon-gold)"); }
+
+        // AUDIO
+        function updateVolume() { document.getElementById('bg-music').volume = document.getElementById('music-volume').value / 100; }
+        function toggleMusic() { const a = document.getElementById('bg-music'); const b = document.getElementById('btn-play-music'); if(isMusicPlaying) { a.pause(); b.innerText='▶️'; } else { if(!a.src||a.src===window.location.href){a.src=MUSIC_TRACKS[currentTrackIdx].url;} a.play().catch(e=>{}); b.innerText='⏸'; document.getElementById('music-track-name').innerText=MUSIC_TRACKS[currentTrackIdx].name; } isMusicPlaying=!isMusicPlaying; }
+        function changeTrack(d) { currentTrackIdx+=d; if(currentTrackIdx<0) currentTrackIdx=MUSIC_TRACKS.length-1; if(currentTrackIdx>=MUSIC_TRACKS.length) currentTrackIdx=0; document.getElementById('bg-music').src=MUSIC_TRACKS[currentTrackIdx].url; if(isMusicPlaying) document.getElementById('bg-music').play(); document.getElementById('music-track-name').innerText=MUSIC_TRACKS[currentTrackIdx].name; }
+        function importCustomMusic(input) { if(input.files && input.files[0]) { const r=new FileReader(); r.onload=function(e){ MUSIC_TRACKS.push({name:"🎵 Importé", url:e.target.result}); currentTrackIdx=MUSIC_TRACKS.length-1; toggleMusic(); toggleMusic(); }; r.readAsDataURL(input.files[0]); } }
 
         // NAVIGATION
-        function switchTab(tabId, el) { document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(v=>v.classList.remove('active')); document.getElementById('view-'+tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'phone') renderEventsList(); }
+        function switchTab(tId, el) { document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(v=>v.classList.remove('active')); document.getElementById('view-'+tId).classList.add('active'); el.classList.add('active'); if(tId==='phone') renderEventsList(); }
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+        // MAIN LOOP
+        setInterval(() => {
+            if (currentGps > 0) game.weed += currentGps / 10;
+            if (adminAutoClickerOn) { game.weed += clickGpc*5; game.cash += 500; } // Super admin cheat
+            
+            if (currentSps > 0 && game.weed > 0) {
+                let amount = Math.min(currentSps/10, game.weed);
+                game.weed -= amount; game.cash += amount * currentPrice;
+                game.sellTransactionCount += 0.1;
+            }
+            
+            // Police mechanic
+            if (game.sellTransactionCount >= 15) {
+                let chunks = Math.floor(game.sellTransactionCount / 15);
+                game.sellTransactionCount %= 15;
+                if (game.vigileDeadline < Date.now()) {
+                    game.heat += chunks * 5;
+                    if (game.heat > 100) game.heat = 100;
+                }
+            }
+            
+            // Check Debt Deadline
+            if (game.debt > 0 && game.debtDeadline < Date.now()) {
+                game.weed = 0; game.cash = 0; game.rep = 0; game.debt = 0;
+                showToast("LE Boss a TOUT pris. Temps écoulé.", "var(--neon-red)");
+            }
+            updateUI();
+        }, 100);
+        setInterval(() => { saveGame(); generateEvent(); }, 12000); 
+
         // START
-        checkAuth();
+        initGame();
     </script>
 </body>
 </html>
